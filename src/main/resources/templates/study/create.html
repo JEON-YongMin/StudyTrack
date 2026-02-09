@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Study Track - 스터디 개설</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<!-- NAV -->
+<nav class="navbar bg-white shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary" href="/">📖 Study Track</a>
+
+        <div>
+            <a href="/dashboard" class="btn btn-outline-primary btn-sm">로그인</a>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="container py-5 text-center">
+    <h2 class="fw-bold mb-2">스터디 개설</h2>
+    <p class="text-muted mb-0">
+        스터디 정보를 입력하고 팀원을 모집해보세요
+    </p>
+</section>
+
+<!-- CONTENT -->
+<section class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+
+                    <!-- 화면 전용 폼 (동작 없음) -->
+                    <form action="#" method="post">
+
+                        <!-- 스터디 제목 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">스터디 제목</label>
+                            <input type="text"
+                                   class="form-control"
+                                   placeholder="예) 스프링 부트 스터디">
+                        </div>
+
+                        <!-- 스터디 설명 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">스터디 설명</label>
+                            <textarea class="form-control"
+                                      rows="4"
+                                      placeholder="스터디 목표, 진행 방식, 주기 등을 간단히 적어주세요"></textarea>
+                        </div>
+
+                        <!-- 옵션 -->
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">최대 인원 수</label>
+                                <input type="number"
+                                       class="form-control"
+                                       min="2"
+                                       max="50"
+                                       value="5">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">카테고리</label>
+                                <select class="form-select">
+                                    <option selected disabled>카테고리를 선택하세요</option>
+                                    <option>전공 / CS</option>
+                                    <option>자격증</option>
+                                    <option>코딩 테스트</option>
+                                    <option>프로젝트</option>
+                                    <option>외국어</option>
+                                    <option>기타</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- 초대 영역 (더미) -->
+                        <div class="mb-3">
+                            <h6 class="fw-bold mb-2">스터디원 초대하기</h6>
+
+                            <div class="alert alert-primary border-0">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div>
+                                        <div class="fw-semibold">초대 코드</div>
+                                    </div>
+                                    <code class="px-3 py-2 bg-white rounded border">
+                                        STUDY-1234
+                                    </code>
+                                </div>
+                            </div>
+
+                            <p class="text-muted small mb-0">
+                                개설 후 초대 코드를 공유해 팀원을 초대할 수 있어요.
+                            </p>
+                        </div>
+
+                        <!-- 버튼 -->
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="/" class="btn btn-outline-primary">취소</a>
+                            <button type="button" class="btn btn-primary">
+                                스터디 개설
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<footer class="text-center py-4 text-muted small">
+    © 2026 Study Track
+</footer>
+
+</body>
+</html>
