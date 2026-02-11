@@ -77,13 +77,22 @@
                 <h5 class="fw-bold mb-3">내 스터디</h5>
 
                 <div class="list-group list-group-flush">
-                    <div class="list-group-item" th:each="study : ${myStudies}">
+<!--                    <div class="list-group-item" th:each="study : ${myStudies}">-->
+<!--                        <div class="d-flex justify-content-between">-->
+<!--                            <div>-->
+<!--                                <h6 class="fw-bold mb-1" th:text="${study.title}">스터디 제목</h6>-->
+<!--                                <small class="text-muted" th:text="${study.description}"></small>-->
+<!--                            </div>-->
+<!--                            <a th:href="@{/study/{id}(id=${study.id})}" class="btn btn-sm btn-primary">열기</a>-->
+<!--                        </div>-->
+<!--                    </div>-->
+                    <div class="list-group-item">
                         <div class="d-flex justify-content-between">
                             <div>
-                                <h6 class="fw-bold mb-1" th:text="${study.title}">스터디 제목</h6>
-                                <small class="text-muted" th:text="${study.description}"></small>
+                                <h6 class="fw-bold mb-1">스터디 제목</h6>
+                                <small class="text-muted"></small>
                             </div>
-                            <a th:href="@{/study/{id}(id=${study.id})}" class="btn btn-sm btn-primary">열기</a>
+                            <a href="/study/detail" class="btn btn-sm btn-primary">열기</a>
                         </div>
                     </div>
                 </div>
