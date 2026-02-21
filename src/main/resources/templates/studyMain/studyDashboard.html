@@ -1,29 +1,25 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Study Track - Dashboard</title>
     <meta charset="UTF-8">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* [핵심 추가] 이 두 줄이 위치를 고정합니다 */
+        html { overflow-y: scroll; }
+        .navbar .container { max-width: 1320px !important; }
+    </style>
 </head>
-
 <body class="bg-light">
 
-<!-- TOP BAR -->
-<nav class="navbar navbar-light bg-white shadow-sm">
+<nav class="navbar bg-white shadow-sm">
     <div class="container">
-        <a class="navbar-brand fw-bold text-primary">📖 Study Track</a>
-
-        <div>
-            <span th:if="${user != null}" class="me-3 fw-semibold" th:text="${user.name}"></span>
-            <a href="/login" th:if="${user == null}" class="btn btn-outline-primary btn-sm">로그인</a>
-            <a href="/logout" th:if="${user != null}" class="btn btn-outline-danger btn-sm">로그아웃</a>
-        </div>
+        <a class="navbar-brand fw-bold text-primary" href="/">📖 Study Track</a>
+        <div id="navAuthArea"></div>
     </div>
 </nav>
 
 <div class="container py-4">
-
-    <!-- HERO -->
     <div class="row mb-4">
         <div class="col">
             <div class="p-4 bg-white rounded shadow-sm">
@@ -34,95 +30,30 @@
             </div>
         </div>
     </div>
-
-    <!-- STATS -->
     <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="bg-white p-3 rounded shadow-sm">
-                <h6 class="text-muted">참여 중 스터디</h6>
-<!--                <h3 th:text="${stats.studyCount}">3</h3>-->
-                <h3>3</h3>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="bg-white p-3 rounded shadow-sm">
-                <h6 class="text-muted">진행 중 과제</h6>
-<!--                <h3 th:text="${stats.assignmentCount}">5</h3>-->
-                <h3>5</h3>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="bg-white p-3 rounded shadow-sm">
-                <h6 class="text-muted">완료율</h6>
-<!--                <h3 th:text="${stats.progress}">72%</h3>-->
-                <h3>72%</h3>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="bg-white p-3 rounded shadow-sm">
-                <h6 class="text-muted">팀원 수</h6>
-<!--                <h3 th:text="${stats.memberCount}">12</h3>-->
-                <h3>12</h3>
-            </div>
-        </div>
+        <div class="col-md-3"><div class="bg-white p-3 rounded shadow-sm"><h6 class="text-muted">참여 중 스터디</h6><h3>3</h3></div></div>
+        <div class="col-md-3"><div class="bg-white p-3 rounded shadow-sm"><h6 class="text-muted">진행 중 과제</h6><h3>5</h3></div></div>
+        <div class="col-md-3"><div class="bg-white p-3 rounded shadow-sm"><h6 class="text-muted">완료율</h6><h3>72%</h3></div></div>
+        <div class="col-md-3"><div class="bg-white p-3 rounded shadow-sm"><h6 class="text-muted">팀원 수</h6><h3>12</h3></div></div>
     </div>
-
-    <!-- MY STUDIES -->
-    <div class="row">
-        <div class="col-md-8">
-            <div class="bg-white p-4 rounded shadow-sm">
-                <h5 class="fw-bold mb-3">내 스터디</h5>
-
-                <div class="list-group list-group-flush">
-<!--                    <div class="list-group-item" th:each="study : ${myStudies}">-->
-<!--                        <div class="d-flex justify-content-between">-->
-<!--                            <div>-->
-<!--                                <h6 class="fw-bold mb-1" th:text="${study.title}">스터디 제목</h6>-->
-<!--                                <small class="text-muted" th:text="${study.description}"></small>-->
-<!--                            </div>-->
-<!--                            <a th:href="@{/study/{id}(id=${study.id})}" class="btn btn-sm btn-primary">열기</a>-->
-<!--                        </div>-->
-<!--                    </div>-->
-                    <div class="list-group-item">
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                <h6 class="fw-bold mb-1">스터디 제목</h6>
-                                <small class="text-muted"></small>
-                            </div>
-                            <a href="/study/detail" class="btn btn-sm btn-primary">열기</a>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- SIDE -->
-        <div class="col-md-4">
-            <div class="bg-white p-4 rounded shadow-sm mb-3">
-                <h6 class="fw-bold mb-2">다가오는 마감일</h6>
-                <ul class="list-unstyled small">
-                    <li th:each="task : ${upcomingTasks}">
-                        ⏰ <span th:text="${task.title}"></span>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="bg-white p-4 rounded shadow-sm">
-                <h6 class="fw-bold mb-2">추천 스터디</h6>
-                <div th:each="study : ${recommendedStudies}" class="mb-2">
-                    <a th:href="@{/study/{id}(id=${study.id})}" class="text-decoration-none">
-                        <div class="border rounded p-2 small fw-semibold" th:text="${study.title}"></div>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const navArea = document.getElementById("navAuthArea");
+        const token = localStorage.getItem("accessToken");
+        const nickname = localStorage.getItem("nickname");
+        const userId = localStorage.getItem("userId");
+        const isExist = (val) => val && val !== "null" && val !== "undefined" && val !== "";
+
+        if (isExist(token)) {
+            const finalName = isExist(nickname) ? nickname : userId;
+            navArea.innerHTML = `<span class="fw-bold me-2 text-dark">${finalName} 님</span><button class="btn btn-outline-danger btn-sm" onclick="logout()">로그아웃</button>`;
+        } else {
+            navArea.innerHTML = `<a href="/auth/signup" class="btn btn-primary btn-sm">회원가입</a> <a href="/auth/login" class="btn btn-outline-primary btn-sm">로그인</a>`;
+        }
+    });
+    function logout() { if(confirm("로그아웃 하시겠습니까?")) { localStorage.clear(); window.location.href = "/"; } }
+</script>
 </body>
 </html>
