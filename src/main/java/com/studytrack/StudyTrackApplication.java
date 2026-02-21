@@ -1,4 +1,4 @@
-package com.example.studytrack;
+package com.studytrack;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
