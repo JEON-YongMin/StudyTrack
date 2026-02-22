@@ -8,16 +8,10 @@
 
 <body class="bg-light">
 
-<!-- TOP BAR -->
-<nav class="navbar navbar-light bg-white shadow-sm">
+<nav class="navbar bg-white shadow-sm">
     <div class="container">
-        <a href="/" class="navbar-brand fw-bold text-primary">📖 Study Track</a>
-
-        <div>
-<!--            <span class="fw-semibold me-3" th:text="${user.name}">사용자</span>-->
-            <span class="fw-semibold me-3" >사용자</span>
-            <a href="/logout" class="btn btn-outline-danger btn-sm">로그아웃</a>
-        </div>
+        <a class="navbar-brand fw-bold text-primary" href="/">📖 Study Track</a>
+        <div id="navAuthArea"></div>
     </div>
 </nav>
 
@@ -81,7 +75,6 @@
                                     마감: <span th:text="${task.deadline}"></span>
                                 </small>
                             </div>
-
                             <span class="badge bg-warning" th:if="${!task.completed}">
                                 진행 중
                             </span>
@@ -155,3 +148,21 @@
 
 </body>
 </html>
+
+<script>
+    /* 상단과 동일한 JS 인증 로직 */
+    document.addEventListener("DOMContentLoaded", function() {
+        const navArea = document.getElementById("navAuthArea");
+        const token = localStorage.getItem("accessToken");
+        const nickname = localStorage.getItem("nickname");
+        const userId = localStorage.getItem("userId");
+        const isExist = (val) => val && val !== "null" && val !== "undefined" && val !== "";
+        if (isExist(token)) {
+            const finalName = isExist(nickname) ? nickname : userId;
+            navArea.innerHTML = `<span class="fw-bold me-2 text-dark">${finalName} 님</span><button class="btn btn-outline-danger btn-sm" onclick="logout()">로그아웃</button>`;
+        } else {
+            navArea.innerHTML = `<a href="/auth/signup" class="btn btn-primary btn-sm">회원가입</a> <a href="/auth/login" class="btn btn-outline-primary btn-sm">로그인</a>`;
+        }
+    });
+    function logout() { if(confirm("로그아웃 하시겠습니까?")) { localStorage.clear(); window.location.href = "/"; } }
+</script>

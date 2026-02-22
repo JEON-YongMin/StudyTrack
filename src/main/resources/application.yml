@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: StudyTrack
+
+jwt:
+  secret: "studytrack_access_token_secret_key_very_long_string_123456"
+  access-token-exp-min: 60
