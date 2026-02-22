@@ -11,7 +11,7 @@
 <!-- TOP BAR -->
 <nav class="navbar navbar-light bg-white shadow-sm">
     <div class="container">
-        <a href="/" class="navbar-brand fw-bold">Study Hub</a>
+        <a href="/" class="navbar-brand fw-bold text-primary">📖 Study Track</a>
 
         <div>
 <!--            <span class="fw-semibold me-3" th:text="${user.name}">사용자</span>-->
@@ -57,7 +57,7 @@
 <!--                    <small class="text-muted" th:text="${notice.createdAt}">2026-02-04</small>-->
 <!--                </div>-->
                 <div class="border-bottom py-2">
-                    <div class="fw-semibold">공지 제목</div>
+                    <div class="fw-semibold"><a href="/notice/detail">공지 제목</a></div>
                     <small class="text-muted">2026-02-04</small>
                 </div>
 
@@ -137,12 +137,11 @@
             <!-- QUICK ACTIONS -->
             <div class="bg-white p-4 rounded shadow-sm">
                 <h6 class="fw-bold mb-2">⚡ 빠른 작업</h6>
-
-                <a href="/assignment/create" class="btn btn-primary btn-sm w-100 mb-2">
-                    과제 추가
-                </a>
                 <a href="/notice/create" class="btn btn-outline-primary btn-sm w-100 mb-2">
                     공지 작성
+                </a>
+                <a href="/assignment/create" class="btn btn-primary btn-sm w-100 mb-2">
+                    과제 추가
                 </a>
                 <a href="/study/settings" class="btn btn-outline-secondary btn-sm w-100">
                     스터디 설정

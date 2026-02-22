@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Study Track - Notice Detail</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<!-- TOP BAR -->
+<nav class="navbar navbar-light bg-white shadow-sm">
+    <div class="container">
+        <a href="/" class="navbar-brand fw-bold text-primary">📖 Study Track</a>
+
+        <div>
+            <a th:href="@{/study/{id}(id=${study.id})}" class="btn btn-outline-primary btn-sm me-2">
+                스터디로
+            </a>
+            <span class="fw-semibold me-3" th:text="${user.name}">사용자</span>
+            <a href="/logout" class="btn btn-outline-danger btn-sm">로그아웃</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4">
+
+    <!-- BREADCRUMB / HEADER -->
+    <div class="mb-3">
+        <div class="text-muted small">
+            <a th:href="@{/study/{id}(id=${study.id})}" class="text-decoration-none">스터디</a>
+            <span class="mx-1">/</span>
+            <a th:href="@{/study/{id}/notices(id=${study.id})}" class="text-decoration-none">공지사항</a>
+            <span class="mx-1">/</span>
+            <span>상세</span>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <!-- MAIN -->
+        <div class="col-md-8">
+
+            <!-- NOTICE CARD -->
+            <div class="bg-white p-4 rounded shadow-sm mb-4">
+
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <span class="badge bg-primary mb-2" th:text="${study.category}">CS</span>
+                        <h3 class="fw-bold mb-2" th:text="${notice.title}">공지 제목</h3>
+
+                        <div class="text-muted small">
+                            <span>작성자: </span><span class="fw-semibold" th:text="${notice.authorName}">홍길동</span>
+                            <span class="mx-2">•</span>
+                            <span th:text="${notice.createdAt}">2026-02-20 13:30</span>
+                            <span class="mx-2">•</span>
+                            <span>조회 </span><span th:text="${notice.viewCount}">12</span>
+                        </div>
+                    </div>
+
+                    <!-- (권한 있는 사용자만 보이게) -->
+                    <div class="d-flex gap-2" th:if="${canEdit}">
+                        <a th:href="@{/notices/{id}/edit(id=${notice.id})}"
+                           class="btn btn-sm btn-outline-secondary">
+                            수정
+                        </a>
+                        <form th:action="@{/notices/{id}/delete(id=${notice.id})}" method="post" class="m-0">
+                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('정말 삭제할까요?');">
+                                삭제
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- NOTICE CONTENT -->
+                <div class="lh-lg" style="white-space: pre-wrap;"
+                     th:text="${notice.content}">
+                    공지 내용이 들어갑니다.
+                    줄바꿈도 유지됩니다.
+                </div>
+
+                <!-- OPTIONAL: ATTACHMENTS -->
+                <div class="mt-4" th:if="${attachments != null && !attachments.isEmpty()}">
+                    <h6 class="fw-bold mb-2">📎 첨부파일</h6>
+                    <div class="list-group">
+                        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                           th:each="file : ${attachments}"
+                           th:href="@{/files/{id}(id=${file.id})}">
+                            <span th:text="${file.originalName}">자료.pdf</span>
+                            <span class="text-muted small" th:text="${file.sizeLabel}">1.2MB</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- COMMENTS -->
+            <div class="bg-white p-4 rounded shadow-sm mb-4">
+                <h5 class="fw-bold mb-3">💬 댓글</h5>
+
+                <!-- comment list -->
+                <div th:if="${comments == null || comments.isEmpty()}" class="text-muted small">
+                    아직 댓글이 없어요. 첫 댓글을 남겨보세요!
+                </div>
+
+                <div th:each="c : ${comments}" class="border-bottom py-3">
+                    <div class="d-flex justify-content-between">
+                        <div class="fw-semibold" th:text="${c.authorName}">댓글작성자</div>
+                        <small class="text-muted" th:text="${c.createdAt}">2026-02-20 14:01</small>
+                    </div>
+                    <div class="small mt-1" style="white-space: pre-wrap;" th:text="${c.content}">
+                        댓글 내용
+                    </div>
+
+                    <!-- comment actions -->
+                    <div class="mt-2 d-flex gap-2" th:if="${c.canEdit}">
+                        <a th:href="@{/comments/{id}/edit(id=${c.id})}" class="btn btn-sm btn-outline-secondary">수정</a>
+                        <form th:action="@{/comments/{id}/delete(id=${c.id})}" method="post" class="m-0">
+                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('댓글을 삭제할까요?');">
+                                삭제
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- comment form -->
+                <form class="mt-4" th:action="@{/notices/{id}/comments(id=${notice.id})}" method="post">
+                    <div class="mb-2">
+                        <textarea name="content" class="form-control" rows="3"
+                                  placeholder="댓글을 입력하세요"></textarea>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary btn-sm">댓글 등록</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- BACK -->
+            <div class="d-flex justify-content-between">
+                <a th:href="@{/study/{id}/notices(id=${study.id})}" class="btn btn-outline-secondary">
+                    목록으로
+                </a>
+                <a th:href="@{/study/{id}(id=${study.id})}" class="btn btn-outline-primary">
+                    스터디 홈
+                </a>
+            </div>
+
+        </div>
+
+        <!-- SIDE -->
+        <div class="col-md-4">
+
+            <!-- STUDY SUMMARY -->
+            <div class="bg-white p-4 rounded shadow-sm mb-3">
+                <h6 class="fw-bold mb-2">📌 스터디 정보</h6>
+                <div class="small">
+                    <div class="mb-1">
+                        <span class="text-muted">스터디명</span><br>
+                        <span class="fw-semibold" th:text="${study.title}">알고리즘 스터디</span>
+                    </div>
+                    <div class="mb-1">
+                        <span class="text-muted">멤버</span><br>
+                        👥 <span th:text="${study.memberCount}">5</span>명
+                    </div>
+                    <div>
+                        <span class="text-muted">운영자</span><br>
+                        <span th:text="${study.ownerName}">홍길동</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUICK ACTIONS -->
+            <div class="bg-white p-4 rounded shadow-sm mb-3">
+                <h6 class="fw-bold mb-2">⚡ 빠른 작업</h6>
+
+                <a th:href="@{/notices/create?studyId={id}(id=${study.id})}"
+                   class="btn btn-primary btn-sm w-100 mb-2">
+                    공지 작성
+                </a>
+
+                <a th:href="@{/assignment/create?studyId={id}(id=${study.id})}"
+                   class="btn btn-outline-primary btn-sm w-100 mb-2">
+                    과제 추가
+                </a>
+
+                <a href="/study/settings" class="btn btn-outline-secondary btn-sm w-100">
+                    스터디 설정
+                </a>
+            </div>
+
+            <!-- RECENT NOTICES -->
+            <div class="bg-white p-4 rounded shadow-sm">
+                <h6 class="fw-bold mb-3">🕒 최근 공지</h6>
+
+                <div th:if="${recentNotices == null || recentNotices.isEmpty()}" class="text-muted small">
+                    최근 공지가 없습니다.
+                </div>
+
+                <div th:each="n : ${recentNotices}" class="mb-2">
+                    <a th:href="@{/notices/{id}(id=${n.id})}" class="text-decoration-none">
+                        <div class="border rounded p-2 small fw-semibold" th:text="${n.title}">
+                            최근 공지 제목
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
