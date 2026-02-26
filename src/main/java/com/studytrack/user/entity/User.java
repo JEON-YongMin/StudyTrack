@@ -24,4 +24,8 @@ public class User {
 
     @Column(nullable = false, length = 30)
     private String nickname;
+
+    public void updateNickname(String newNickname) {
+        this.nickname = newNickname;
+    }
 }
