@@ -72,7 +72,9 @@
                         </div>
                         <div class="d-flex justify-content-end gap-2 mt-4">
                             <a href="/" class="btn btn-outline-primary">취소</a>
-                            <button type="button" class="btn btn-primary">스터디 개설</button>
+                            <button type="button" id="createStudyBtn" class="btn btn-primary">
+                                스터디 개설
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -99,6 +101,86 @@
         }
     });
     function logout() { if(confirm("로그아웃 하시겠습니까?")) { localStorage.clear(); window.location.href = "/"; } }
+
+    <!-- studyCreate -->
+    document.addEventListener("DOMContentLoaded", function () {
+
+      const btn = document.getElementById("createStudyBtn");
+
+      btn.addEventListener("click", async function () {
+
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+          alert("로그인이 필요합니다.");
+          window.location.href = "/auth/login";
+          return;
+        }
+
+        // 입력값 수집
+        const title = document.querySelector('input[type="text"]').value.trim();
+        const description = document.querySelector("textarea").value.trim();
+        const maxMembers = Number(document.querySelector('input[type="number"]').value);
+        const categoryText = document.querySelector("select").value;
+
+        const categoryMap = {
+          "전공 / CS": "CS",
+          "자격증": "CERTIFICATE",
+          "코딩 테스트": "CODING_TEST",
+          "프로젝트": "PROJECT",
+          "외국어": "LANGUAGE",
+          "기타": "ETC"
+        };
+
+        if (!title || !description) {
+          alert("제목과 설명을 입력해주세요.");
+          return;
+        }
+
+        const category = categoryMap[categoryText];
+        if (!category) {
+          alert("카테고리를 선택해주세요.");
+          return;
+        }
+
+        const requestBody = {
+          title: title,
+          description: description,
+          maxMembers: maxMembers,
+          category: category
+        };
+
+        try {
+          const response = await fetch("/api/studyCreate", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": token.startsWith("Bearer ") ? token : ("Bearer " + token)
+            },
+            body: JSON.stringify(requestBody)
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            alert("스터디 개설 실패: " + errorText);
+            return;
+          }
+
+          const data = await response.json();
+
+          alert("스터디가 개설되었습니다!");
+
+          // 👉 상세 페이지로 이동
+          // 저장 성공 후
+<!--          window.location.href = `/study/detail?studyId=${data.studyId}`;-->
+          window.location.href = `/study/${data.studyId}`;
+        } catch (error) {
+          console.error(error);
+          alert("서버 오류가 발생했습니다.");
+        }
+
+      });
+
+    });
 </script>
 </body>
 </html>

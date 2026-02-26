@@ -19,21 +19,16 @@
 
     <!-- HEADER -->
     <div class="bg-white p-4 rounded shadow-sm mb-4">
-<!--        <h3 class="fw-bold mb-2" th:text="${study.title}">알고리즘 스터디</h3>-->
-        <h3 class="fw-bold mb-2">알고리즘 스터디</h3>
-<!--        <p class="text-muted mb-2" th:text="${study.description}">-->
-<!--            매주 알고리즘 문제 풀이 및 코드 리뷰-->
-<!--        </p>-->
-        <p class="text-muted mb-2">
-            매주 알고리즘 문제 풀이 및 코드 리뷰
+        <h3 class="fw-bold mb-2" th:text="${study.title}">스터디 제목</h3>
+        <p class="text-muted mb-2" th:text="${study.description}">
+            스터디 설명
         </p>
-<!--        <span class="badge bg-primary" th:text="${study.category}">CS</span>-->
-        <span class="badge bg-primary">CS</span>
-<!--        <span class="badge bg-secondary ms-1">-->
-<!--            👥 <span th:text="${study.memberCount}">5</span>명 참여-->
-<!--        </span>-->
+        <span class="badge bg-primary" th:text="${study.category}">CS</span>
+
         <span class="badge bg-secondary ms-1">
-            👥 <span>5</span>명 참여
+            👥 <span th:text="${study.memberCount}">참여인원</span>
+            /
+            <span th:text="${study.maxMembers}">최대인원</span>명 참여
         </span>
     </div>
 
@@ -46,13 +41,9 @@
             <div class="bg-white p-4 rounded shadow-sm mb-4">
                 <h5 class="fw-bold mb-3">📢 공지사항</h5>
 
-<!--                <div th:each="notice : ${notices}" class="border-bottom py-2">-->
-<!--                    <div class="fw-semibold" th:text="${notice.title}">공지 제목</div>-->
-<!--                    <small class="text-muted" th:text="${notice.createdAt}">2026-02-04</small>-->
-<!--                </div>-->
-                <div class="border-bottom py-2">
-                    <div class="fw-semibold"><a href="/notice/detail">공지 제목</a></div>
-                    <small class="text-muted">2026-02-04</small>
+                <div th:each="notice : ${notices}" class="border-bottom py-2">
+                    <div class="fw-semibold" th:text="${notice.title}">공지 제목</div>
+                    <small class="text-muted" th:text="${notice.createdAt}">2026-02-04</small>
                 </div>
 
                 <a href="/notice/create" class="btn btn-sm btn-outline-primary mt-3">
@@ -65,27 +56,28 @@
                 <h5 class="fw-bold mb-3">📚 과제 목록</h5>
 
                 <div class="list-group list-group-flush">
-                    <div class="list-group-item" th:each="task : ${assignments}">
+                    <a class="list-group-item list-group-item-action" th:each="task : ${assignments}" th:href="@{/study/{studyId}/assignment/{assignmentId}(studyId=${study.id}, assignmentId=${task.id})}">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <div class="fw-semibold" th:text="${task.title}">
                                     알고리즘 문제 1
                                 </div>
                                 <small class="text-muted">
-                                    마감: <span th:text="${task.deadline}"></span>
+                                    마감: <span th:text="${task.dueDate}"></span>
                                 </small>
                             </div>
-                            <span class="badge bg-warning" th:if="${!task.completed}">
-                                진행 중
+                            <span class="badge bg-warning" th:if="${task.progress != null and task.progress.name() == 'INPROGRESS'}">
+                              진행중
                             </span>
-                            <span class="badge bg-success" th:if="${task.completed}">
-                                완료
+                            <span class="badge bg-success" th:if="${task.progress != null and task.progress.name() == 'COMPLETED'}">
+                              완료
                             </span>
                         </div>
-                    </div>
+                    </a>
                 </div>
 
-                <a href="/assignment/create" class="btn btn-sm btn-outline-primary mt-3">
+                <a class="btn btn-primary"
+                   th:href="@{'/study/' + ${study.id} + '/assignments/new'}">
                     과제 추가
                 </a>
             </div>
@@ -133,7 +125,7 @@
                 <a href="/notice/create" class="btn btn-outline-primary btn-sm w-100 mb-2">
                     공지 작성
                 </a>
-                <a href="/assignment/create" class="btn btn-primary btn-sm w-100 mb-2">
+                <a th:href="@{'/study/' + ${study.id} + '/assignments/new'}" class="btn btn-primary btn-sm w-100 mb-2">
                     과제 추가
                 </a>
                 <a href="/study/settings" class="btn btn-outline-secondary btn-sm w-100">
@@ -165,4 +157,54 @@
         }
     });
     function logout() { if(confirm("로그아웃 하시겠습니까?")) { localStorage.clear(); window.location.href = "/"; } }
+
+<!-- studyDetail -->
+
+    function getQueryParam(name) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(name);
+  }
+
+  function setText(selector, text) {
+    const el = document.querySelector(selector);
+    if (el) el.textContent = text;
+  }
+
+  async function loadStudyDetail() {
+    const studyId = getQueryParam("studyId");
+    if (!studyId) return;
+
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      window.location.href = "/auth/login";
+      return;
+    }
+
+    const res = await fetch(`/api/studyCreate/${studyId}`, {
+      headers: {
+        "Authorization": token.startsWith("Bearer ") ? token : `Bearer ${token}`
+      }
+    });
+
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      alert(`스터디 정보를 불러오지 못했습니다. (status=${res.status})\n${msg}`);
+      return;
+    }
+
+    const data = await res.json();
+    // 화면 채우기
+    setText(".bg-white.p-4.rounded.shadow-sm.mb-4 h3.fw-bold", data.title);
+    setText(".bg-white.p-4.rounded.shadow-sm.mb-4 p.text-muted", data.description);
+    setText(".bg-white.p-4.rounded.shadow-sm.mb-4 .badge.bg-primary", data.category);
+
+    // 참여 인원은 지금 백엔드에 없으니 임시로 1명(개설자) 처리
+    setText(".bg-white.p-4.rounded.shadow-sm.mb-4 .badge.bg-secondary span", "1");
+
+    // 초대코드도 화면에 표시하고 싶다면: detail.html에 code 영역을 만들거나 원하는 위치 selector 지정
+    // 예: setText("#inviteCode", data.inviteCode);
+  }
+
+  document.addEventListener("DOMContentLoaded", loadStudyDetail);
 </script>
