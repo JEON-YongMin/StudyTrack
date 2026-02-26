@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${assignment != null} ? 'Study Track - 과제 상세' : 'Study Track - 과제 추가'">Study Track - 과제</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<!-- TOP BAR -->
+<nav class="navbar navbar-light bg-white shadow-sm">
+    <div class="container">
+        <a href="/" class="navbar-brand fw-bold text-primary">📖 Study Track</a>
+        <div id="navAuthArea"></div>
+    </div>
+</nav>
+
+<div class="container py-4">
+
+    <!-- BREADCRUMB -->
+    <div class="mb-3">
+        <div class="text-muted small">
+            <a th:href="@{/study/{id}(id=${study.id})}" class="text-decoration-none">스터디</a>
+            <span class="mx-1">/</span>
+            <a th:href="@{/study/{id}/assignments(id=${study.id})}" class="text-decoration-none">과제</a>
+            <span class="mx-1">/</span>
+
+            <!-- create / detail 표시 -->
+            <span th:if="${assignment == null}">추가</span>
+            <span th:if="${assignment != null}" th:text="${assignment.title}">과제 상세</span>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <!-- MAIN -->
+        <div class="col-md-8">
+
+            <div class="bg-white p-4 rounded shadow-sm mb-4">
+                <h3 class="fw-bold mb-1" th:text="${assignment != null} ? '📝 과제 상세' : '📚 과제 추가'">📚 과제</h3>
+                <p class="text-muted mb-4"
+                   th:text="${assignment != null} ? '과제 내용을 확인하고 필요하면 수정하세요.' : '마감일, 설명, 우선순위 등을 입력해 팀원에게 과제를 배포하세요.'">
+                    마감일, 설명, 링크/첨부 등을 입력해 팀원에게 과제를 배포하세요.
+                </p>
+
+                <!-- FORM -->
+                <form id="assignmentForm" enctype="multipart/form-data">
+
+                    <!-- hidden: study id -->
+                    <input type="hidden" name="studyId" th:value="${study.id}" value="1">
+
+                    <!-- hidden: assignment id (있으면 상세/수정 모드) -->
+                    <input type="hidden" name="assignmentId"
+                           th:value="${assignment != null ? assignment.id : ''}"
+                           value="">
+
+                    <!-- Title -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">과제 제목</label>
+                        <input type="text" name="title" class="form-control"
+                               placeholder="예: 2주차 알고리즘 문제 풀이"
+                               th:value="${assignment != null ? assignment.title : ''}"
+                               required>
+                        <div class="form-text">팀원들이 이해하기 쉬운 제목으로 작성해요.</div>
+                    </div>
+
+                    <!-- Deadline + Priority -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">마감일</label>
+                            <!-- 서버에서 assignment.dueDate가 LocalDateTime이면 ISO로 내려주면 그대로 들어감 -->
+                            <input type="datetime-local" name="deadline" class="form-control"
+                                   th:value="${assignment != null ? assignment.dueDate : ''}"
+                                   required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">우선순위</label>
+                            <select name="priority" class="form-select">
+                                <option value="LOW"
+                                        th:selected="${assignment != null and assignment.priority != null and assignment.priority.name() == 'LOW'}">
+                                    낮음
+                                </option>
+                                <option value="MEDIUM"
+                                        th:selected="${assignment == null or (assignment.priority != null and assignment.priority.name() == 'MEDIUM')}">
+                                    보통
+                                </option>
+                                <option value="HIGH"
+                                        th:selected="${assignment != null and assignment.priority != null and assignment.priority.name() == 'HIGH'}">
+                                    높음
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">설명</label>
+                        <textarea name="description" class="form-control" rows="6"
+                                  placeholder="과제 요구사항, 제출 방법, 참고 자료 등을 적어주세요."
+                                  th:text="${assignment != null ? assignment.description : ''}"></textarea>
+                        <div class="form-text">줄바꿈이 유지되도록 저장(예: TEXT)하면 보기 좋아요.</div>
+                    </div>
+
+                    <!-- Attachments (현재는 UI만, 백엔드 연결 전) -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">첨부파일 (선택)</label>
+                        <input type="file" name="files" class="form-control" multiple>
+                        <div class="form-text">PDF, 이미지, 텍스트 등 과제 자료를 올릴 수 있어요.</div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a th:href="@{/study/{id}(id=${study.id})}" class="btn btn-outline-secondary">
+                            스터디로 돌아가기
+                        </a>
+
+                        <div class="d-flex gap-2">
+                            <!-- 상세(읽기)에서만 보이는 버튼 -->
+                            <button type="button" id="editBtn" class="btn btn-outline-primary"
+                                    th:if="${assignment != null}">
+                                수정
+                            </button>
+
+                            <!-- 생성/수정 저장 버튼(공통) -->
+                            <button type="submit" id="saveBtn" class="btn btn-primary">
+                                <span th:text="${assignment != null} ? '저장' : '과제 생성'">과제 생성</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+
+        <!-- SIDE -->
+        <div class="col-md-4">
+
+            <!-- STUDY SUMMARY -->
+            <div class="bg-white p-4 rounded shadow-sm mb-3">
+                <h6 class="fw-bold mb-2">📌 스터디 정보</h6>
+                <div class="small">
+                    <div class="mb-1">
+                        <span class="text-muted">스터디명</span><br>
+                        <span class="fw-semibold" th:text="${study.title}">알고리즘 스터디</span>
+                    </div>
+                    <div class="mb-1">
+                        <span class="text-muted">멤버</span><br>
+                        👥 <span th:text="${study.memberCount}">5</span>명
+                    </div>
+                    <div>
+                        <span class="text-muted">운영자</span><br>
+                        <span th:text="${ownerName}">홍길동</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TIP CARD -->
+            <div class="bg-white p-4 rounded shadow-sm mb-3">
+                <h6 class="fw-bold mb-2">✅ 작성 팁</h6>
+                <ul class="small text-muted mb-0">
+                    <li>제목에 “주차/주제”를 넣으면 찾기 쉬워요.</li>
+                    <li>설명에는 “제출 형식/기한/평가 기준”을 포함해요.</li>
+                </ul>
+            </div>
+
+            <!-- PREVIEW (simple) -->
+            <div class="bg-white p-4 rounded shadow-sm">
+                <h6 class="fw-bold mb-2">👀 미리보기</h6>
+                <div class="small text-muted">
+                    입력한 내용이 실제 과제 카드로 보이는 형태를 상상하기 쉬우라고 넣었어요.
+                </div>
+                <div class="border rounded p-3 mt-3">
+                    <div class="fw-semibold" id="previewTitle">과제 제목</div>
+                    <div class="text-muted small" id="previewDue">마감: YYYY-MM-DD HH:mm</div>
+                    <span class="badge bg-warning mt-2">진행 중</span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    /* 상단과 동일한 JS 인증 로직 */
+    document.addEventListener("DOMContentLoaded", function() {
+        const navArea = document.getElementById("navAuthArea");
+        const token = localStorage.getItem("accessToken");
+        const nickname = localStorage.getItem("nickname");
+        const userId = localStorage.getItem("userId");
+        const isExist = (val) => val && val !== "null" && val !== "undefined" && val !== "";
+        if (isExist(token)) {
+            const finalName = isExist(nickname) ? nickname : userId;
+            navArea.innerHTML = `<span class="fw-bold me-2 text-dark">${finalName} 님</span><button class="btn btn-outline-danger btn-sm" onclick="logout()">로그아웃</button>`;
+        } else {
+            navArea.innerHTML = `<a href="/auth/signup" class="btn btn-primary btn-sm">회원가입</a> <a href="/auth/login" class="btn btn-outline-primary btn-sm">로그인</a>`;
+        }
+    });
+    function logout() { if(confirm("로그아웃 하시겠습니까?")) { localStorage.clear(); window.location.href = "/"; } }
+
+    const isExist = (val) => val && val !== "null" && val !== "undefined" && val !== "";
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("assignmentForm");
+        if (!form) return;
+
+        const studyId = form.querySelector('input[name="studyId"]').value;
+        const assignmentId = form.querySelector('input[name="assignmentId"]').value;
+
+        const titleEl = form.querySelector('input[name="title"]');
+        const descEl = form.querySelector('textarea[name="description"]');
+        const priorityEl = form.querySelector('select[name="priority"]');
+        const deadlineEl = form.querySelector('input[name="deadline"]');
+
+        const editBtn = document.getElementById("editBtn");
+
+        // ✅ 상세 페이지면(assignmentId 존재) 기본은 읽기 전용
+        const setReadonly = (readonly) => {
+            titleEl.disabled = readonly;
+            descEl.disabled = readonly;
+            priorityEl.disabled = readonly;
+            deadlineEl.disabled = readonly;
+
+            // 첨부는 아직 API 연동 전이라, 상세에서는 막아두는 게 안전
+            const filesEl = form.querySelector('input[name="files"]');
+            if (filesEl) filesEl.disabled = readonly;
+        };
+
+        if (isExist(assignmentId)) {
+            setReadonly(true);
+        }
+
+        // ✅ 미리보기 동기화
+        const syncPreview = () => {
+            const t = (titleEl.value || "과제 제목").trim();
+            document.getElementById("previewTitle").textContent = t;
+
+            const d = deadlineEl.value ? deadlineEl.value.replace("T", " ") : "YYYY-MM-DD HH:mm";
+            document.getElementById("previewDue").textContent = `마감: ${d}`;
+        };
+        ["input", "change"].forEach(evt => {
+            titleEl.addEventListener(evt, syncPreview);
+            deadlineEl.addEventListener(evt, syncPreview);
+        });
+        syncPreview();
+
+        // ✅ 수정 버튼 → 편집 모드로 전환
+        if (editBtn) {
+            editBtn.addEventListener("click", () => {
+                setReadonly(false);
+                titleEl.focus();
+            });
+        }
+
+        // ✅ 제출: Create(POST) / Update(PUT) 분기
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const token = localStorage.getItem("accessToken");
+            if (!isExist(token)) {
+                alert("로그인이 필요합니다.");
+                window.location.href = "/auth/login";
+                return;
+            }
+            const auth = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+
+            const title = titleEl.value.trim();
+            const description = descEl.value.trim();
+            const priority = priorityEl.value; // enum string
+            const deadlineLocal = deadlineEl.value; // datetime-local
+
+            if (!title) return alert("과제 제목을 입력해주세요.");
+            if (!deadlineLocal) return alert("마감일을 입력해주세요.");
+
+            const payload = {
+                title,
+                description: description || "",
+                priority,
+                dueDate: deadlineLocal
+            };
+
+            let url, method;
+
+            // ✅ Update
+            if (isExist(assignmentId)) {
+                method = "PUT";
+                url = `/api/study/${studyId}/assignments/${assignmentId}`;
+            } else {
+                // ✅ Create
+                method = "POST";
+                url = `/api/study/${studyId}/assignments`;
+            }
+
+            const res = await fetch(url, {
+                method,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": auth
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const text = await res.text().catch(() => "");
+            if (!res.ok) {
+                alert(`처리 실패 (status=${res.status})\n${text}`);
+                return;
+            }
+
+            // ✅ 성공 → 스터디 상세로 복귀
+            window.location.href = `/study/${studyId}`;
+        });
+    });
+</script>
+</body>
+</html>

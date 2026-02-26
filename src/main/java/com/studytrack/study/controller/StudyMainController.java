@@ -11,9 +11,4 @@ public class StudyMainController {
         return "studyMain/studyMain";
     }
 
-    @GetMapping("/login")
-    public String login() {
-        return "studyMain/studyDashboard";
-    }
-
 }

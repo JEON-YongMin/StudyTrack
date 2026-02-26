@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Study Track - 스터디 설정</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<!-- TOP BAR -->
+<nav class="navbar navbar-light bg-white shadow-sm">
+    <div class="container">
+        <a href="/" class="navbar-brand fw-bold text-primary">📖 Study Track</a>
+
+        <div>
+            <a th:href="@{/study/{id}(id=${study.id})}" class="btn btn-outline-primary btn-sm me-2">
+                스터디로
+            </a>
+            <span class="fw-semibold me-3" th:text="${user.name}">사용자</span>
+            <a href="/logout" class="btn btn-outline-danger btn-sm">로그아웃</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4">
+
+    <!-- BREADCRUMB -->
+    <div class="mb-3">
+        <div class="text-muted small">
+            <a th:href="@{/study/{id}(id=${study.id})}" class="text-decoration-none">스터디</a>
+            <span class="mx-1">/</span>
+            <span>설정</span>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <!-- MAIN -->
+        <div class="col-md-8">
+
+            <!-- HEADER -->
+            <div class="bg-white p-4 rounded shadow-sm mb-4">
+                <h3 class="fw-bold mb-1">⚙️ 스터디 설정</h3>
+                <p class="text-muted mb-0">
+                    스터디 정보 수정, 멤버/권한 관리, 공개 범위 설정을 할 수 있어요.
+                </p>
+            </div>
+
+            <!-- BASIC INFO -->
+            <div class="bg-white p-4 rounded shadow-sm mb-4">
+                <h5 class="fw-bold mb-3">기본 정보</h5>
+
+                <form th:action="@{/study/{id}/settings(id=${study.id})}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">스터디 이름</label>
+                        <input type="text" name="title" class="form-control"
+                               th:value="${study.title}" value="알고리즘 스터디" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">설명</label>
+                        <textarea name="description" class="form-control" rows="5"
+                                  th:text="${study.description}">매주 문제 풀이 및 코드 리뷰</textarea>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">카테고리</label>
+                            <select class="form-select" name="category">
+                                <option value="CS" th:selected="${study.category == 'CS'}">CS</option>
+                                <option value="ALGO" th:selected="${study.category == 'ALGO'}">알고리즘</option>
+                                <option value="FRONT" th:selected="${study.category == 'FRONT'}">프론트엔드</option>
+                                <option value="BACK" th:selected="${study.category == 'BACK'}">백엔드</option>
+                                <option value="LANG" th:selected="${study.category == 'LANG'}">외국어</option>
+                                <option value="ETC" th:selected="${study.category == 'ETC'}">기타</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">정원</label>
+                            <input type="number" min="2" max="100" name="capacity" class="form-control"
+                                   th:value="${study.capacity}" value="8">
+                            <div class="form-text">정원을 넘으면 참여 요청이 제한되도록 할 수 있어요.</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-primary" type="submit">저장</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- PRIVACY / JOIN -->
+            <div class="bg-white p-4 rounded shadow-sm mb-4">
+                <h5 class="fw-bold mb-3">공개 범위 & 참여 설정</h5>
+
+                <form th:action="@{/study/{id}/settings/join(id=${study.id})}" method="post">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">공개 범위</label>
+                        <div class="border rounded p-3">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="visibility"
+                                       id="public" value="PUBLIC"
+                                       th:checked="${study.visibility == 'PUBLIC'}">
+                                <label class="form-check-label" for="public">
+                                    전체 공개 (리스트에 노출)
+                                </label>
+                                <div class="form-text">누구나 스터디를 검색/열람할 수 있어요.</div>
+                            </div>
+
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="visibility"
+                                       id="private" value="PRIVATE"
+                                       th:checked="${study.visibility == 'PRIVATE'}">
+                                <label class="form-check-label" for="private">
+                                    비공개 (링크/초대만)
+                                </label>
+                                <div class="form-text">초대받은 사람만 접근할 수 있어요.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">참여 방식</label>
+                        <div class="border rounded p-3">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="joinPolicy"
+                                       id="autoJoin" value="AUTO"
+                                       th:checked="${study.joinPolicy == 'AUTO'}">
+                                <label class="form-check-label" for="autoJoin">
+                                    자동 승인
+                                </label>
+                                <div class="form-text">요청 없이 즉시 참여할 수 있어요.</div>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="joinPolicy"
+                                       id="requestJoin" value="REQUEST"
+                                       th:checked="${study.joinPolicy == 'REQUEST'}">
+                                <label class="form-check-label" for="requestJoin">
+                                    승인 필요
+                                </label>
+                                <div class="form-text">관리자가 승인해야 참여할 수 있어요.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-primary" type="submit">저장</button>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- ROLES / PERMISSIONS -->
+            <div class="bg-white p-4 rounded shadow-sm mb-4">
+                <h5 class="fw-bold mb-3">권한 설정</h5>
+
+                <form th:action="@{/study/{id}/settings/permissions(id=${study.id})}" method="post">
+                    <div class="border rounded p-3 mb-3">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="allowMemberCreateNotice"
+                                   id="allowMemberCreateNotice"
+                                   th:checked="${settings.allowMemberCreateNotice}">
+                            <label class="form-check-label" for="allowMemberCreateNotice">
+                                팀원도 공지 작성 가능
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="allowMemberCreateAssignment"
+                                   id="allowMemberCreateAssignment"
+                                   th:checked="${settings.allowMemberCreateAssignment}">
+                            <label class="form-check-label" for="allowMemberCreateAssignment">
+                                팀원도 과제 추가 가능
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="allowMemberInvite"
+                                   id="allowMemberInvite"
+                                   th:checked="${settings.allowMemberInvite}">
+                            <label class="form-check-label" for="allowMemberInvite">
+                                팀원도 멤버 초대 가능
+                            </label>
+                        </div>
+
+                        <div class="form-text mt-2">
+                            과제/공지 품질 관리를 위해 기본은 “운영자만”을 추천해요.
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-primary" type="submit">저장</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- MEMBER MANAGEMENT -->
+            <div class="bg-white p-4 rounded shadow-sm mb-4">
+                <h5 class="fw-bold mb-3">멤버 관리</h5>
+
+                <div class="list-group">
+                    <div class="list-group-item d-flex justify-content-between align-items-center"
+                         th:each="m : ${members}">
+                        <div>
+                            <div class="fw-semibold" th:text="${m.name}">홍길동</div>
+                            <small class="text-muted" th:text="${m.email}">hong@test.com</small>
+                        </div>
+
+                        <div class="d-flex gap-2 align-items-center">
+                            <span class="badge bg-light text-dark" th:text="${m.role}">MEMBER</span>
+
+                            <!-- 운영자만 보이게 -->
+                            <form th:if="${canManageMembers}" th:action="@{/study/{id}/members/{memberId}/role(id=${study.id}, memberId=${m.id})}"
+                                  method="post" class="m-0">
+                                <select name="role" class="form-select form-select-sm" style="width: 120px;">
+                                    <option value="MEMBER" th:selected="${m.role=='MEMBER'}">팀원</option>
+                                    <option value="MANAGER" th:selected="${m.role=='MANAGER'}">매니저</option>
+                                </select>
+                                <button class="btn btn-sm btn-outline-primary mt-2 w-100" type="submit">권한 변경</button>
+                            </form>
+
+                            <form th:if="${canManageMembers}" th:action="@{/study/{id}/members/{memberId}/kick(id=${study.id}, memberId=${m.id})}"
+                                  method="post" class="m-0">
+                                <button class="btn btn-sm btn-outline-danger" type="submit"
+                                        onclick="return confirm('이 멤버를 내보낼까요?');">
+                                    내보내기
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <a th:href="@{/member/invite?studyId={id}(id=${study.id})}"
+                   class="btn btn-outline-primary btn-sm mt-3">
+                    멤버 초대
+                </a>
+            </div>
+
+            <!-- DANGER ZONE -->
+            <div class="bg-white p-4 rounded shadow-sm border border-danger mb-4">
+                <h5 class="fw-bold text-danger mb-2">위험 구역</h5>
+                <p class="text-muted small mb-3">
+                    아래 작업은 되돌릴 수 없어요. 신중하게 진행하세요.
+                </p>
+
+                <form th:action="@{/study/{id}/delete(id=${study.id})}" method="post">
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold text-danger">스터디 삭제</label>
+                        <div class="form-text">
+                            삭제하면 공지/과제/멤버 데이터가 모두 사라집니다.
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-danger"
+                            onclick="return confirm('정말 삭제할까요? 이 작업은 되돌릴 수 없습니다.');">
+                        스터디 삭제
+                    </button>
+                </form>
+            </div>
+
+            <!-- BACK -->
+            <div class="d-flex justify-content-between">
+                <a th:href="@{/study/{id}(id=${study.id})}" class="btn btn-outline-secondary">
+                    돌아가기
+                </a>
+                <a th:href="@{/}" class="btn btn-outline-primary">
+                    홈
+                </a>
+            </div>
+
+        </div>
+
+        <!-- SIDE -->
+        <div class="col-md-4">
+
+            <!-- STUDY SUMMARY -->
+            <div class="bg-white p-4 rounded shadow-sm mb-3">
+                <h6 class="fw-bold mb-2">📌 현재 스터디</h6>
+                <div class="small">
+                    <div class="mb-1">
+                        <span class="text-muted">스터디명</span><br>
+                        <span class="fw-semibold" th:text="${study.title}">알고리즘 스터디</span>
+                    </div>
+                    <div class="mb-1">
+                        <span class="text-muted">상태</span><br>
+                        <span class="badge bg-success" th:if="${study.active}">운영 중</span>
+                        <span class="badge bg-secondary" th:if="${!study.active}">종료</span>
+                    </div>
+                    <div class="mb-1">
+                        <span class="text-muted">멤버</span><br>
+                        👥 <span th:text="${study.memberCount}">5</span> / <span th:text="${study.capacity}">8</span>
+                    </div>
+                    <div>
+                        <span class="text-muted">공개</span><br>
+                        <span class="badge bg-primary" th:text="${study.visibility}">PUBLIC</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HELP -->
+            <div class="bg-white p-4 rounded shadow-sm mb-3">
+                <h6 class="fw-bold mb-2">💡 설정 가이드</h6>
+                <ul class="small text-muted mb-0">
+                    <li>초기에는 “승인 필요”를 추천해요.</li>
+                    <li>공지/과제는 운영자만 작성하도록 하면 관리가 쉬워요.</li>
+                    <li>정원(capacity)은 가입 제한에 활용 가능해요.</li>
+                </ul>
+            </div>
+
+            <!-- QUICK ACTIONS -->
+            <div class="bg-white p-4 rounded shadow-sm">
+                <h6 class="fw-bold mb-2">⚡ 빠른 작업</h6>
+                <a th:href="@{/notices/create?studyId={id}(id=${study.id})}"
+                   class="btn btn-outline-primary btn-sm w-100 mb-2">
+                    공지 작성
+                </a>
+                <a th:href="@{/assignment/create?studyId={id}(id=${study.id})}"
+                   class="btn btn-outline-primary btn-sm w-100 mb-2">
+                    과제 추가
+                </a>
+                <a th:href="@{/study/{id}/members(id=${study.id})}"
+                   class="btn btn-outline-secondary btn-sm w-100">
+                    멤버 보기
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
