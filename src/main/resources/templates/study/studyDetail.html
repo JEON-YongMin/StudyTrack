@@ -41,12 +41,14 @@
             <div class="bg-white p-4 rounded shadow-sm mb-4">
                 <h5 class="fw-bold mb-3">📢 공지사항</h5>
 
-                <div th:each="notice : ${notices}" class="border-bottom py-2">
-                    <div class="fw-semibold" th:text="${notice.title}">공지 제목</div>
-                    <small class="text-muted" th:text="${notice.createdAt}">2026-02-04</small>
+                <div th:each="notice : ${notice}" class="border-bottom py-2">
+                    <a th:href="@{/study/{studyId}/notice/{noticeId}(studyId=${study.id}, noticeId=${notice.id}, mode='view')}">
+                        <div class="fw-semibold" th:text="${notice.title}">공지 제목</div>
+                        <small class="text-muted" th:text="${notice.createdAt}">2026-02-04</small>
+                    </a>
                 </div>
 
-                <a href="/notice/create" class="btn btn-sm btn-outline-primary mt-3">
+                <a th:href="@{/study/{studyId}/notice(studyId=${study.id}, mode='create')}" class="btn btn-sm btn-outline-primary mt-3">
                     공지 작성
                 </a>
             </div>
@@ -122,7 +124,8 @@
             <!-- QUICK ACTIONS -->
             <div class="bg-white p-4 rounded shadow-sm">
                 <h6 class="fw-bold mb-2">⚡ 빠른 작업</h6>
-                <a href="/notice/create" class="btn btn-outline-primary btn-sm w-100 mb-2">
+                <a th:href="@{/study/{studyId}/notice
+                (studyId=${study.id}, mode='create')}" class="btn btn-outline-primary btn-sm w-100 mb-2">
                     공지 작성
                 </a>
                 <a th:href="@{'/study/' + ${study.id} + '/assignments/new'}" class="btn btn-primary btn-sm w-100 mb-2">

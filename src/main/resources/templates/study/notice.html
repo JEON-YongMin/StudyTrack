@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Study Track - Notice Detail</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<!-- TOP BAR -->
+<nav class="navbar navbar-light bg-white shadow-sm">
+    <div class="container">
+        <a href="/" class="navbar-brand fw-bold text-primary">📖 Study Track</a>
+        <div id="navAuthArea" class="d-flex gap-2 align-items-center"></div>
+    </div>
+</nav>
+
+<div class="container py-4">
+
+    <!-- BREADCRUMB / HEADER -->
+    <div class="mb-3">
+        <div class="text-muted small">
+            <a th:href="@{/study/{id}(id=${study.id})}" class="text-decoration-none">스터디</a>
+            <span class="mx-1">/</span>
+            <a th:href="@{/study/{id}/notice(id=${study.id})}" class="text-decoration-none">공지사항</a>
+            <span class="mx-1">/</span>
+            <span>상세</span>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <!-- MAIN -->
+        <div class="col-md-8">
+
+            <!-- NOTICE CARD -->
+            <div class="bg-white p-4 rounded shadow-sm mb-4"
+                 th:with="m=${mode}">
+
+                <form id="noticeForm" name="noticeForm">
+
+                    <input type="hidden" id="studyId" th:value="${study.id}">
+                    <input type="hidden" id="noticeId" th:value="${notice != null ? notice.id : ''}">
+                    <input type="hidden" id="mode" th:value="${mode}">
+
+                    <!-- edit일 때 PUT 처리 -->
+                    <input type="hidden" name="_method" value="put" th:if="${m == 'edit'}"/>
+
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+
+                <span class="badge bg-primary mb-2"
+                      th:text="${study.category}">CS</span>
+
+                            <!-- 제목 -->
+                            <div th:if="${m == 'view'}">
+                                <h3 class="fw-bold mb-2"
+                                    th:text="${notice.title}">공지 제목</h3>
+                            </div>
+
+                            <div th:if="${m != 'view'}">
+                                <input type="text"
+                                       name="title"
+                                       class="form-control mb-2"
+                                       th:value="${notice != null ? notice.title : ''}"
+                                       placeholder="공지 제목을 입력하세요"/>
+                            </div>
+
+                            <!-- 메타정보 (view에서만) -->
+                            <div class="text-muted small"
+                                 th:if="${m == 'view'}">
+                                <span>작성자: </span>
+                                <span class="fw-semibold"
+                                      th:text="${author.nickname}">홍길동</span>
+                                <span class="mx-2">•</span>
+                                <span th:text="${notice.createdAt}">2026-02-20</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- 내용 -->
+                    <div th:if="${m == 'view'}"
+                         class="lh-lg"
+                         style="white-space: pre-wrap;"
+                         th:text="${notice.content}">
+                    </div>
+
+                    <div th:if="${m != 'view'}">
+                        <textarea name="content" class="form-control" rows="8" th:text="${notice != null ? notice.content : ''}" placeholder="공지 내용을 입력하세요">
+
+                        </textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4"
+                         th:with="m=${mode}">
+
+                        <!-- create -->
+                        <button type="submit"
+                                class="btn btn-primary"
+                                th:if="${m == 'create'}">
+                            등록
+                        </button>
+
+                        <!-- edit -->
+                        <div th:if="${m == 'edit'}" class="d-flex gap-2"> <button type="submit" class="btn btn-primary">
+                                저장
+                            </button>
+                            <a class="btn btn-outline-secondary" th:href="@{/study/{studyId}/notice/{noticeId}(studyId=${study.id}, noticeId=${notice.id}, mode='view')}">
+                                취소
+                            </a>
+                        </div>
+
+                        <!-- view + 권한 -->
+                        <div th:if="${m == 'view'}" class="d-flex gap-2">
+                            <button type="button" id="editBtn" class="btn btn-outline-secondary">
+                                수정
+                            </button>
+
+                            <button type="button" id="deleteBtn" class="btn btn-outline-danger">
+                                삭제
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- BACK -->
+            <div class="d-flex justify-content-between">
+
+                <a th:href="@{/study/{id}(id=${study.id})}" class="btn btn-outline-primary">
+                    스터디 홈
+                </a>
+            </div>
+
+        </div>
+
+        <!-- SIDE -->
+        <div class="col-md-4">
+
+            <!-- STUDY SUMMARY -->
+            <div class="bg-white p-4 rounded shadow-sm mb-3">
+                <h6 class="fw-bold mb-2">📌 스터디 정보</h6>
+                <div class="small">
+                    <div class="mb-1">
+                        <span class="text-muted">스터디명</span><br>
+                        <span class="fw-semibold" th:text="${study.title}">알고리즘 스터디</span>
+                    </div>
+                    <div class="mb-1">
+                        <span class="text-muted">멤버</span><br>
+                        👥 <span th:text="${study.memberCount}">5</span>명
+                    </div>
+                    <div>
+                        <span class="text-muted">운영자</span><br>
+                        <span th:text="${ownerName}">홍길동</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUICK ACTIONS -->
+            <div class="bg-white p-4 rounded shadow-sm mb-3">
+                <h6 class="fw-bold mb-2">⚡ 빠른 작업</h6>
+
+                <a th:href="@{/notice/create?studyId={id}(id=${study.id})}"
+                   class="btn btn-primary btn-sm w-100 mb-2">
+                    공지 작성
+                </a>
+
+                <a th:href="@{/assignment/create?studyId={id}(id=${study.id})}"
+                   class="btn btn-outline-primary btn-sm w-100 mb-2">
+                    과제 추가
+                </a>
+
+                <a href="/study/settings" class="btn btn-outline-secondary btn-sm w-100">
+                    스터디 설정
+                </a>
+            </div>
+
+            <!-- RECENT NOTICE -->
+            <div class="bg-white p-4 rounded shadow-sm">
+                <h6 class="fw-bold mb-3">🕒 최근 공지</h6>
+
+                <div th:if="${recentNotice == null || recentNotice.isEmpty()}" class="text-muted small">
+                    최근 공지가 없습니다.
+                </div>
+
+                <div th:each="n : ${recentNotice}" class="mb-2">
+                    <a th:href="@{/notice/{id}(id=${n.id})}" class="text-decoration-none">
+                        <div class="border rounded p-2 small fw-semibold" th:text="${n.title}">
+                            최근 공지 제목
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    /* 상단과 동일한 JS 인증 로직 */
+
+    const isExist = (val) => val && val !== "null" && val !== "undefined" && val !== "";
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+    const navArea = document.getElementById("navAuthArea");
+        const token = localStorage.getItem("accessToken");
+        const nickname = localStorage.getItem("nickname");
+        const userId = localStorage.getItem("userId");
+        if (isExist(token)) {
+            const finalName = isExist(nickname) ? nickname : userId;
+            navArea.innerHTML = `<span class="fw-bold me-2 text-dark">${finalName} 님</span><button class="btn btn-outline-danger btn-sm" onclick="logout()">로그아웃</button>`;
+        } else {
+            navArea.innerHTML = `<a href="/auth/signup" class="btn btn-primary btn-sm">회원가입</a> <a href="/auth/login" class="btn btn-outline-primary btn-sm">로그인</a>`;
+        }
+
+    const form = document.getElementById("noticeForm");
+
+    const studyIdEl = document.getElementById("studyId");
+    const noticeIdEl = document.getElementById("noticeId");
+    const modeEl = document.getElementById("mode");
+
+    const editBtn = document.getElementById("editBtn");
+    const deleteBtn = document.getElementById("deleteBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const saveBtn = document.getElementById("saveBtn");
+
+    const studyId = studyIdEl?.value;
+    const noticeId = noticeIdEl?.value;
+    const mode = modeEl?.value || "view";
+
+    if (mode === "view") {
+        // localStorage에서 현재 로그인한 유저 ID를 가져옵니다.
+        const loginUserId = localStorage.getItem("userId");
+        // 타임리프를 통해 서버에서 전달받은 작성자 ID (HTML 내 hidden 필드 등에 저장 권장)
+        const authorId = "[[${notice != null ? notice.authorId : ''}]]";
+
+        if (isExist(loginUserId) && String(loginUserId) === String(authorId)) {
+            if(editBtn) editBtn.classList.remove("d-none");
+            if(deleteBtn) deleteBtn.classList.remove("d-none");
+        } else {
+            // 본인이 아니면 숨김
+            if(editBtn) editBtn.style.display = 'none';
+            if(deleteBtn) deleteBtn.style.display = 'none';
+        }
+    }
+
+    // 1) 수정 버튼 클릭 시: mode를 edit으로 변경하여 페이지 리로드
+    if (editBtn != null) {
+        editBtn.addEventListener("click", () => {
+            window.location.href = `/study/${studyId}/notice/${noticeId}?mode=edit`;
+        });
+    }
+
+    // 2) 삭제 버튼 클릭 시: DELETE API 호출
+    if (deleteBtn != null) {
+        deleteBtn.addEventListener("click", async () => {
+            if (!confirm("정말 삭제하시겠습니까?")) return;
+
+            const token = localStorage.getItem("accessToken");
+            const auth = token?.startsWith("Bearer ") ? token : `Bearer ${token}`;
+
+            const res = await fetch(`/api/study/${studyId}/notice/${noticeId}`, {
+                method: "DELETE",
+                headers: { "Authorization": auth }
+            });
+
+            if (res.ok) {
+                alert("삭제되었습니다.");
+                window.location.href = `/study/${studyId}`;
+            } else {
+                alert("삭제 실패");
+            }
+        });
+    }
+    function logout() { if(confirm("로그아웃 하시겠습니까?")) { localStorage.clear(); window.location.href = "/"; } }
+
+    form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const token = localStorage.getItem("accessToken");
+            if (!isExist(token)) {
+                alert("로그인이 필요합니다.");
+                window.location.href = "/auth/login";
+                return;
+            }
+            const auth = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+
+            const title = form.querySelector('input[name="title"]').value.trim();
+            const content = form.querySelector('textarea[name="content"]').value.trim();
+
+            if (!title) return alert("공지 제목을 입력해주세요.");
+            if (!content) return alert("공지 내용을 입력해주세요.");
+
+            const payload = {
+                title,
+                content
+            };
+
+            let url, method;
+
+            // ✅ Update
+            if (isExist(noticeId)) {
+                method = "PUT";
+                url = `/api/study/${studyId}/notice/${noticeId}`;
+            } else {
+                // ✅ Create
+                method = "POST";
+                url = `/api/study/${studyId}/notice`;
+            }
+
+            const res = await fetch(url, {
+                method,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": auth
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const text = await res.text().catch(() => "");
+            if (!res.ok) {
+                alert(`처리 실패 (status=${res.status})\n${text}`);
+                return;
+            }
+
+            // ✅ 성공 → 스터디 상세로 복귀
+            window.location.href = `/study/${studyId}`;
+        });
+  });
+
+</script>
+</body>
+</html>
