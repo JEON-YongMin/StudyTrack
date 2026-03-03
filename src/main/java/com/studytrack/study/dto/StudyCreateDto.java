@@ -1,6 +1,7 @@
 package com.studytrack.study.dto;
 
 import com.studytrack.study.enums.StudyCategory;
+import com.studytrack.study.enums.Visibility;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
@@ -21,7 +22,10 @@ public class StudyCreateDto {
             @NotNull @Min(2) @Max(50) Integer maxMembers,
 
             @Schema(description="카테고리", example="PROJECT")
-            @NotNull StudyCategory category
+            @NotNull StudyCategory category,
+
+            @Schema(description="공개 상태", example="PUBLIC")
+            @NotNull Visibility visibility
     ) {}
 
     @Schema(description = "스터디 개설 응답")

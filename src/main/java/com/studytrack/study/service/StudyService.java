@@ -1,6 +1,8 @@
 package com.studytrack.study.service;
 
 import com.studytrack.study.dto.StudyCreateDto;
+import com.studytrack.study.dto.StudySettingDto;
+import com.studytrack.study.entity.Assignment;
 import com.studytrack.study.entity.Study;
 import com.studytrack.study.entity.StudyMember;
 import com.studytrack.study.enums.StudyRole;
@@ -18,7 +20,7 @@ import java.security.SecureRandom;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class StudyCreateService {
+public class StudyService {
 
     private final StudyRepository studyRepository;
     private final UserRepository userRepository;
@@ -36,6 +38,7 @@ public class StudyCreateService {
                 request.memberCount(),
                 request.maxMembers(),
                 request.category(),
+                request.visibility(),
                 inviteCode
         );
 
@@ -53,6 +56,40 @@ public class StudyCreateService {
 
         return new StudyCreateDto.StudyCreateResponse(savedStudy.getId(), savedStudy.getInviteCode());
     }
+
+    @Transactional
+    public StudySettingDto.Response updateStudy(Long id, StudySettingDto.Request request) {
+
+        Study study = studyRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 스터디가 존재하지 않습니다."));
+
+        study.update(
+                request.title(),
+                request.description(),
+                request.maxMembers(),
+                request.category(),
+                request.visibility()
+        );
+
+        return new StudySettingDto.Response(
+                study.getId(),
+                study.getTitle(),
+                study.getDescription(),
+                study.getMaxMembers(),
+                study.getCategory(),
+                study.getVisibility()
+        );
+    }
+
+    @Transactional
+    public void deleteStudy(Long studyId) {
+        Study study = studyRepository.findById(studyId)
+                .orElseThrow(() -> new IllegalArgumentException("스터디를 찾을 수 없습니다. id=" + studyId));
+
+
+        studyRepository.delete(study);
+    }
+
 
     private String generateUniqueInviteCode() {
         for (int attempt = 0; attempt < 20; attempt++) {
