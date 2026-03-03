@@ -42,11 +42,11 @@
                             <textarea class="form-control" rows="4" placeholder="스터디 목표, 진행 방식, 주기 등을 간단히 적어주세요"></textarea>
                         </div>
                         <div class="row g-3">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label fw-semibold">최대 인원 수</label>
                                 <input type="number" class="form-control" min="2" max="50" value="5">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label fw-semibold">카테고리</label>
                                 <select class="form-select">
                                     <option selected disabled>카테고리를 선택하세요</option>
@@ -57,6 +57,14 @@
                                     <option>외국어</option>
                                     <option>기타</option>
                                 </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">공개 상태</label>
+                                <select id="visibility" class="form-select">
+                                    <option value="PUBLIC" selected>공개</option>
+                                    <option value="PRIVATE">비공개</option>
+                                </select>
+                                <div class="form-text">비공개 시 초대 코드로만 입장 가능해요.</div>
                             </div>
                         </div>
                         <hr class="my-4">
@@ -120,6 +128,7 @@
         const description = document.querySelector("textarea").value.trim();
         const maxMembers = Number(document.querySelector('input[type="number"]').value);
         const categoryText = document.querySelector("select").value;
+        const visibility = document.getElementById("visibility").value;
 
         const categoryMap = {
           "전공 / CS": "CS",
@@ -145,7 +154,8 @@
           title: title,
           description: description,
           maxMembers: maxMembers,
-          category: category
+          category: category,
+          visibility: visibility
         };
 
         try {

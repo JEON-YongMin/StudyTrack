@@ -5,7 +5,7 @@ import com.studytrack.study.dto.StudyDetailDto;
 import com.studytrack.study.entity.Study;
 import com.studytrack.study.repository.StudyMemberRepository;
 import com.studytrack.study.repository.StudyRepository;
-import com.studytrack.study.service.StudyCreateService;
+import com.studytrack.study.service.StudyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,11 +20,11 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/api/studyCreate")
 public class StudyCreateRestController {
 
-    private final StudyCreateService studyCreateService;
+    private final StudyService studyCreateService;
     private final StudyRepository studyRepository;
     private final StudyMemberRepository studyMemberRepository;
 
-    public StudyCreateRestController(StudyCreateService studyCreateService, StudyRepository studyRepository, StudyMemberRepository studyMemberRepository) {
+    public StudyCreateRestController(StudyService studyCreateService, StudyRepository studyRepository, StudyMemberRepository studyMemberRepository) {
         this.studyCreateService = studyCreateService;
         this.studyRepository = studyRepository;
         this.studyMemberRepository = studyMemberRepository;
@@ -48,6 +48,7 @@ public class StudyCreateRestController {
                 study.getDescription(),
                 study.getMaxMembers(),
                 study.getCategory(),
+                study.getVisibility(),
                 study.getInviteCode(),
                 study.getMemberCount()
         );

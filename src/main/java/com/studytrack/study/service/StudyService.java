@@ -1,6 +1,7 @@
 package com.studytrack.study.service;
 
 import com.studytrack.study.dto.StudyCreateDto;
+import com.studytrack.study.dto.StudySettingDto;
 import com.studytrack.study.entity.Study;
 import com.studytrack.study.entity.StudyMember;
 import com.studytrack.study.enums.StudyRole;
@@ -18,7 +19,7 @@ import java.security.SecureRandom;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class StudyCreateService {
+public class StudyService {
 
     private final StudyRepository studyRepository;
     private final UserRepository userRepository;
@@ -36,6 +37,7 @@ public class StudyCreateService {
                 request.memberCount(),
                 request.maxMembers(),
                 request.category(),
+                request.visibility(),
                 inviteCode
         );
 
@@ -52,6 +54,30 @@ public class StudyCreateService {
         studyMemberRepository.save(owner);
 
         return new StudyCreateDto.StudyCreateResponse(savedStudy.getId(), savedStudy.getInviteCode());
+    }
+
+    @Transactional
+    public StudySettingDto.Response updateStudy(Long id, StudySettingDto.Request request) {
+
+        Study study = studyRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 스터디가 존재하지 않습니다."));
+
+        study.update(
+                request.title(),
+                request.description(),
+                request.maxMembers(),
+                request.category(),
+                request.visibility()
+        );
+
+        return new StudySettingDto.Response(
+                study.getId(),
+                study.getTitle(),
+                study.getDescription(),
+                study.getMaxMembers(),
+                study.getCategory(),
+                study.getVisibility()
+        );
     }
 
     private String generateUniqueInviteCode() {

@@ -39,10 +39,6 @@ public class NoticeController {
         Study study = studyRepository.findById(studyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "스터디를 찾을 수 없습니다."));
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = String.valueOf(principal);
-
-
         StudyMember ownerName = studyMemberService.getOwnerMember(studyId);
 
         model.addAttribute("study", study);

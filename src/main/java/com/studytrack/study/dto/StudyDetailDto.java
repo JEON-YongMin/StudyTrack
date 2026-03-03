@@ -1,6 +1,7 @@
 package com.studytrack.study.dto;
 
 import com.studytrack.study.enums.StudyCategory;
+import com.studytrack.study.enums.Visibility;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public class StudyDetailDto {
@@ -12,6 +13,7 @@ public class StudyDetailDto {
             @Schema(example = "매주 알고리즘 문제 풀이 및 코드 리뷰") String description,
             @Schema(example = "5") Integer maxMembers,
             @Schema(example = "CS") StudyCategory category,
+            @Schema(example = "PUBLIC") Visibility visibility,
             @Schema(example = "STUDY-AB12CD") String inviteCode,
             @Schema(example = "1") Integer memberCount) {}
 }

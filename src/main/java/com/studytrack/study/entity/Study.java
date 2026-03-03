@@ -1,9 +1,14 @@
 package com.studytrack.study.entity;
 
 import com.studytrack.study.enums.StudyCategory;
+import com.studytrack.study.enums.Visibility;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "study")
 public class Study {
 
@@ -26,28 +31,32 @@ public class Study {
     @Column(nullable = false, length = 30)
     private StudyCategory category;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Visibility visibility;
+
     @Column(nullable = false, unique = true, length = 20)
     private String inviteCode;
 
     protected Study() {}
 
-    public Study(String title, String description,Integer memberCount, Integer maxMembers, StudyCategory category, String inviteCode) {
+    public Study(String title, String description,Integer memberCount, Integer maxMembers, StudyCategory category, Visibility visibility, String inviteCode) {
         this.title = title;
         this.description = description;
         this.memberCount = 1;
         this.maxMembers = maxMembers;
         this.category = category;
+        this.visibility = visibility;
         this.inviteCode = inviteCode;
     }
 
-    public Long getId() { return id; }
-    public String getInviteCode() { return inviteCode; }
-    public String getTitle() { return title; }
-    public String getDescription() { return description; }
-    public Integer getMaxMembers() { return maxMembers; }
-    public StudyCategory getCategory() { return category; }
-    public int getMemberCount() { return memberCount; }
-    public void setMemberCount(int memberCount) { this.memberCount = memberCount; }
+    public void update(String title, String description, int maxMembers, StudyCategory category, Visibility visibility) {
+        this.title = title;
+        this.description = description;
+        this.maxMembers = maxMembers;
+        this.category = category;
+        this.visibility = visibility;
+    }
 
     public void increaseMemberCount() {
         this.memberCount++;

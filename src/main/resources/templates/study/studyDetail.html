@@ -131,7 +131,7 @@
                 <a th:href="@{'/study/' + ${study.id} + '/assignments/new'}" class="btn btn-primary btn-sm w-100 mb-2">
                     과제 추가
                 </a>
-                <a href="/study/settings" class="btn btn-outline-secondary btn-sm w-100">
+                <a th:href="@{'/study/' + ${study.id} + '/setting'}" class="btn btn-outline-secondary btn-sm w-100">
                     스터디 설정
                 </a>
             </div>

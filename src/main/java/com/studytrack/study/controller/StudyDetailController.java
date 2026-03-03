@@ -46,11 +46,6 @@ public class StudyDetailController {
 
     }
 
-    @GetMapping("/study/setting")
-    public String studySetting() {
-        return "study/studySetting";
-    }
-
     @GetMapping("/study/members")
     public String studyMembers() {
         return "study/studyMembers";
