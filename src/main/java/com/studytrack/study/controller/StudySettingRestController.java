@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,5 +24,15 @@ public class StudySettingRestController {
             @Valid @RequestBody StudySettingDto.Request request) {
 
         return studyService.updateStudy(studyId, request);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<String> deleteStudy(@PathVariable Long studyId) {
+        try {
+            studyService.deleteStudy(studyId);
+            return ResponseEntity.ok("삭제 성공");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한이 없거나 실패했습니다.");
+        }
     }
 }

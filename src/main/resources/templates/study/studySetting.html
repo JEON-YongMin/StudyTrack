@@ -191,6 +191,7 @@
     document.addEventListener("DOMContentLoaded", function() {
     // 폼 요소 선택
     const settingForm = document.querySelector('form[action*="/settings"]');
+    const deleteForm = document.querySelector('form[action*="/delete"]');
 
     if (settingForm) {
         settingForm.addEventListener("submit", async function(e) {
@@ -240,6 +241,44 @@
             } catch (error) {
                 console.error("Error updating study:", error);
                 alert("서버와 통신 중 오류가 발생했습니다.");
+            }
+        });
+    }
+
+    if (deleteForm) {
+        deleteForm.addEventListener("submit", async function(e) {
+            e.preventDefault(); // 기본 폼 제출(페이지 이동) 방지
+
+            if (!confirm("정말 삭제할까요? 이 작업은 되돌릴 수 없으며 모든 데이터가 삭제됩니다.")) return;
+
+            const token = localStorage.getItem("accessToken");
+            if (!token) {
+                alert("로그인이 필요합니다.");
+                window.location.href = "/auth/login";
+                return;
+            }
+
+            const studyId = "[[${study.id}]]"; // 타임리프 변수 활용
+            const auth = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+
+            try {
+                const response = await fetch(`/api/study/${studyId}/setting`, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": auth
+                    }
+                });
+
+                if (response.ok) {
+                    alert("스터디가 안전하게 삭제되었습니다.");
+                    window.location.href = "/"; // 삭제 후 홈으로 이동
+                } else {
+                    const errorText = await response.text();
+                    alert("삭제 실패: " + (errorText || "권한이 없거나 오류가 발생했습니다."));
+                }
+            } catch (error) {
+                console.error("Delete Error:", error);
+                alert("서버 통신 중 오류가 발생했습니다.");
             }
         });
     }

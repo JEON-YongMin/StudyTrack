@@ -2,6 +2,7 @@ package com.studytrack.study.service;
 
 import com.studytrack.study.dto.StudyCreateDto;
 import com.studytrack.study.dto.StudySettingDto;
+import com.studytrack.study.entity.Assignment;
 import com.studytrack.study.entity.Study;
 import com.studytrack.study.entity.StudyMember;
 import com.studytrack.study.enums.StudyRole;
@@ -79,6 +80,16 @@ public class StudyService {
                 study.getVisibility()
         );
     }
+
+    @Transactional
+    public void deleteStudy(Long studyId) {
+        Study study = studyRepository.findById(studyId)
+                .orElseThrow(() -> new IllegalArgumentException("스터디를 찾을 수 없습니다. id=" + studyId));
+
+
+        studyRepository.delete(study);
+    }
+
 
     private String generateUniqueInviteCode() {
         for (int attempt = 0; attempt < 20; attempt++) {
