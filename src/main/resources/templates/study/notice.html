@@ -74,7 +74,7 @@
                                 <span class="fw-semibold"
                                       th:text="${author.nickname}">홍길동</span>
                                 <span class="mx-2">•</span>
-                                <span th:text="${notice.createdAt}">2026-02-20</span>
+                                <span th:text="${#temporals.format(notice.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2026-02-20</span>
                             </div>
                         </div>
 

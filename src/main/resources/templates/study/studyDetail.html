@@ -44,7 +44,7 @@
                 <div th:each="notice : ${notice}" class="border-bottom py-2">
                     <a th:href="@{/study/{studyId}/notice/{noticeId}(studyId=${study.id}, noticeId=${notice.id}, mode='view')}">
                         <div class="fw-semibold" th:text="${notice.title}">공지 제목</div>
-                        <small class="text-muted" th:text="${notice.createdAt}">2026-02-04</small>
+                        <small class="text-muted" th:text="${#temporals.format(notice.createdAt, 'yyyy-MM-dd')}">2026-02-04</small>
                     </a>
                 </div>
 
