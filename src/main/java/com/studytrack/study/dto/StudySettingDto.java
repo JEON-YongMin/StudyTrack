@@ -1,6 +1,7 @@
 package com.studytrack.study.dto;
 
 import com.studytrack.study.enums.StudyCategory;
+import com.studytrack.study.enums.StudyRole;
 import com.studytrack.study.enums.Visibility;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -33,4 +34,9 @@ public class StudySettingDto {
             Visibility visibility
     ) {}
 
+    public record MyStudyResponse(
+            Long id,
+            String title,
+            StudyRole role
+    ) {}
 }

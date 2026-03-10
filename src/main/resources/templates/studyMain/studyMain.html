@@ -5,14 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        html { overflow-y: scroll; }
-        .navbar .container {
-            max-width: 1320px !important;
-            padding-left: 20px !important;
-            padding-right: 20px !important;
-        }
-    </style>
+    <link th:href="@{/css/common.css}" rel="stylesheet">
 </head>
 <body class="bg-light">
 
@@ -26,7 +19,7 @@
 <section class="container py-5 text-center">
     <h2 class="fw-bold mb-2">함께 공부할 팀을 찾아보세요</h2>
     <p class="text-muted mb-3">스터디 모집부터 과제 관리까지 한 번에</p>
-    <a href="/study/start" class="btn btn-primary btn-lg">스터디 시작하기</a>
+    <button id="btnStartStudy" onclick="startStudy()" class="btn btn-primary btn-lg">스터디 시작하기</button>
 </section>
 
 <section class="container pb-4">
@@ -52,31 +45,21 @@
 </section>
 
 <footer class="text-center py-4 text-muted small">© 2026 Study Track</footer>
-
+<script th:src="@{/js/nav-auth-area.js}"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const navArea = document.getElementById("navAuthArea");
-        const token = localStorage.getItem("accessToken");
-        const nickname = localStorage.getItem("nickname");
-        const userId = localStorage.getItem("userId");
-        const isExist = (val) => val && val !== "null" && val !== "undefined" && val !== "";
+    function startStudy() {
+       // 1. 로컬 스토리지에서 유저 아이디 가져오기
+       const userId = localStorage.getItem('userId');
 
-        if (isExist(token)) {
-            const finalName = isExist(nickname) ? nickname : userId;
-            // [중요] /user/mypage.html -> /user/mypage 로 수정
-            navArea.innerHTML = `
-                <span class="fw-bold me-3 text-dark">${finalName} 님</span>
-                <a href="/user/mypage" class="btn btn-outline-primary btn-sm me-2">마이페이지</a>
-                <button class="btn btn-outline-danger btn-sm" onclick="logout()">로그아웃</button>
-            `;
-        } else {
-            navArea.innerHTML = `
-                <a href="/auth/signup" class="btn btn-primary btn-sm">회원가입</a>
-                <a href="/auth/login" class="btn btn-outline-primary btn-sm">로그인</a>
-            `;
-        }
-    });
-    function logout() { if(confirm("로그아웃 하시겠습니까?")) { localStorage.clear(); window.location.href = "/"; } }
+       // 2. URL 파라미터로 붙여서 이동
+       if (userId) {
+           // 주소가 /study/start?userId=아이디 형식으로 바뀝니다.
+           location.href = "/study/start?userId=" + encodeURIComponent(userId);
+       } else {
+           // 아이디가 없으면 그냥 이동
+           location.href = "/study/start";
+       }
+   }
 </script>
 </body>
 </html>

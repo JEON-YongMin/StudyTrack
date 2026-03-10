@@ -51,9 +51,4 @@ public class StudyDetailController {
         return "study/studyMembers";
     }
 
-    @GetMapping("/study/start")
-    public String studyStart() {
-        return "study/studyStart";
-    }
-
 }

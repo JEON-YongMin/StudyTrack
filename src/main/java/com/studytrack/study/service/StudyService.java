@@ -1,10 +1,11 @@
 package com.studytrack.study.service;
 
 import com.studytrack.study.dto.StudyCreateDto;
+import com.studytrack.study.dto.StudyResponseDto;
 import com.studytrack.study.dto.StudySettingDto;
-import com.studytrack.study.entity.Assignment;
 import com.studytrack.study.entity.Study;
 import com.studytrack.study.entity.StudyMember;
+import com.studytrack.study.enums.StudyCategory;
 import com.studytrack.study.enums.StudyRole;
 import com.studytrack.study.repository.StudyMemberRepository;
 import com.studytrack.study.repository.StudyRepository;
@@ -14,8 +15,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.security.SecureRandom;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -90,6 +95,49 @@ public class StudyService {
         studyRepository.delete(study);
     }
 
+    @Transactional(readOnly = true)
+    public List<StudyResponseDto> getMyStudies(String userId) {
+        return studyRepository.findByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<StudyResponseDto> findPublicStudies(String query, StudyCategory category, Pageable pageable) {
+        // Repository에서 Pageable을 포함한 검색 메서드 호출
+        return studyRepository.findPublicStudiesWithOwner(query, category, pageable);
+    }
+
+    @Transactional
+    public void joinStudy(Long studyId, String userId) {
+        // 1. 스터디 존재 확인
+        Study study = studyRepository.findById(studyId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
+
+        // 2. 정원 확인
+        if (study.getMemberCount() >= study.getMaxMembers()) {
+            throw new IllegalStateException("스터디 정원이 가득 찼습니다.");
+        }
+
+        // 3. 이미 가입된 유저인지 확인
+        boolean isAlreadyMember = studyMemberRepository.existsByStudyIdAndUserUserId(studyId, userId);
+        if (isAlreadyMember) {
+            throw new IllegalStateException("이미 참여 중인 스터디입니다.");
+        }
+
+        // 4. 멤버 추가 (기본 역할은 MEMBER)
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        StudyMember newMember = StudyMember.builder()
+                .study(study)
+                .user(user)
+                .role(StudyRole.MEMBER)
+                .build();
+
+        studyMemberRepository.save(newMember);
+
+        // 5. 스터디 엔티티의 현재 인원수 업데이트 (필요 시)
+        study.increaseMemberCount();
+    }
 
     private String generateUniqueInviteCode() {
         for (int attempt = 0; attempt < 20; attempt++) {
