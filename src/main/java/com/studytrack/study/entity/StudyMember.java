@@ -3,9 +3,14 @@ package com.studytrack.study.entity;
 import com.studytrack.study.enums.StudyRole;
 import com.studytrack.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+
 import java.time.LocalDateTime;
 
 @Entity
+@AllArgsConstructor
+@Builder
 public class StudyMember {
 
     @Id

@@ -5,20 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        html { overflow-y: scroll; }
-        .navbar .container {
-            max-width: 1320px !important;
-            padding-left: 20px !important;
-            padding-right: 20px !important;
-        }
-    </style>
+    <link th:href="@{/css/common.css}" rel="stylesheet">
 </head>
 <body class="bg-light">
 
 <nav class="navbar bg-white shadow-sm">
     <div class="container d-flex justify-content-between align-items-center">
-        <a class="navbar-brand fw-bold text-primary m-0" href="/">📖 Study Track</a>
+        <a href="/" class="navbar-brand fw-bold text-primary">📖 Study Track</a>
         <div id="navAuthArea" class="d-flex gap-2 align-items-center"></div>
     </div>
 </nav>
@@ -43,11 +36,11 @@
                             <textarea class="form-control" rows="4" placeholder="스터디 목표, 진행 방식, 주기 등을 간단히 적어주세요"></textarea>
                         </div>
                         <div class="row g-3">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label fw-semibold">최대 인원 수</label>
                                 <input type="number" class="form-control" min="2" max="50" value="5">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label fw-semibold">카테고리</label>
                                 <select class="form-select">
                                     <option selected disabled>카테고리를 선택하세요</option>
@@ -58,6 +51,14 @@
                                     <option>외국어</option>
                                     <option>기타</option>
                                 </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">공개 상태</label>
+                                <select id="visibility" class="form-select">
+                                    <option value="PUBLIC" selected>공개</option>
+                                    <option value="PRIVATE">비공개</option>
+                                </select>
+                                <div class="form-text">비공개 시 초대 코드로만 입장 가능해요.</div>
                             </div>
                         </div>
                         <hr class="my-4">
@@ -84,23 +85,8 @@
 </section>
 
 <footer class="text-center py-4 text-muted small">© 2026 Study Track</footer>
-
+<script th:src="@{/js/nav-auth-area.js}"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const navArea = document.getElementById("navAuthArea");
-        const token = localStorage.getItem("accessToken");
-        const nickname = localStorage.getItem("nickname");
-        const userId = localStorage.getItem("userId");
-        const isExist = (val) => val && val !== "null" && val !== "undefined" && val !== "";
-
-        if (isExist(token)) {
-            const finalName = isExist(nickname) ? nickname : userId;
-            navArea.innerHTML = `<span class="fw-bold me-2 text-dark">${finalName} 님</span><button class="btn btn-outline-danger btn-sm" onclick="logout()">로그아웃</button>`;
-        } else {
-            navArea.innerHTML = `<a href="/auth/signup" class="btn btn-primary btn-sm">회원가입</a> <a href="/auth/login" class="btn btn-outline-primary btn-sm">로그인</a>`;
-        }
-    });
-    function logout() { if(confirm("로그아웃 하시겠습니까?")) { localStorage.clear(); window.location.href = "/"; } }
 
     <!-- studyCreate -->
     document.addEventListener("DOMContentLoaded", function () {
@@ -121,6 +107,7 @@
         const description = document.querySelector("textarea").value.trim();
         const maxMembers = Number(document.querySelector('input[type="number"]').value);
         const categoryText = document.querySelector("select").value;
+        const visibility = document.getElementById("visibility").value;
 
         const categoryMap = {
           "전공 / CS": "CS",
@@ -146,7 +133,8 @@
           title: title,
           description: description,
           maxMembers: maxMembers,
-          category: category
+          category: category,
+          visibility: visibility
         };
 
         try {

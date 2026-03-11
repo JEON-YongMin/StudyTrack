@@ -5,7 +5,10 @@ import com.studytrack.study.entity.Study;
 import com.studytrack.study.enums.StudyRole;
 import com.studytrack.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface StudyMemberRepository extends JpaRepository<StudyMember, Long> {
@@ -13,6 +16,11 @@ public interface StudyMemberRepository extends JpaRepository<StudyMember, Long> 
     Optional<StudyMember> findByStudyAndUser(Study study, User user);
 
     Optional<StudyMember> findByStudyIdAndRole(Long studyId, StudyRole role);
+
+    boolean existsByStudyIdAndUserUserId(Long studyId, String userId);
+
+    @Query("select sm from StudyMember sm join fetch sm.study where sm.user.userId = :userId")
+    List<StudyMember> findByUserIdWithStudy(@Param("userId") String userId);
 
     long countByStudy(Study study);
 }

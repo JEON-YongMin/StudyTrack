@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
 </head>
 
 <body class="bg-light">
@@ -12,16 +13,8 @@
 <!-- HEADER -->
 <nav class="navbar navbar-light bg-white shadow-sm">
     <div class="container">
-        <!-- ✅ 요청한 로고 형태 적용 -->
         <a href="/" class="navbar-brand fw-bold text-primary">📖 Study Track</a>
-
-        <div class="d-flex align-items-center gap-2">
-      <span class="small text-muted" th:if="${user != null}">
-        <span th:text="${user.name}">사용자</span> 님
-      </span>
-            <a href="/logout" class="btn btn-outline-danger btn-sm" th:if="${user != null}">로그아웃</a>
-            <a href="/login" class="btn btn-outline-primary btn-sm" th:if="${user == null}">로그인</a>
-        </div>
+        <div id="navAuthArea" class="d-flex gap-2 align-items-center"></div>
     </div>
 </nav>
 
@@ -38,8 +31,14 @@
     <!-- TABS -->
     <ul class="nav nav-tabs mb-3" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="tab-public" data-bs-toggle="tab" data-bs-target="#panel-public"
-                    type="button" role="tab" aria-controls="panel-public" aria-selected="true">
+            <button class="nav-link active" id="tab-my" data-bs-toggle="tab" data-bs-target="#panel-my"
+                    type="button" role="tab" aria-controls="panel-my" aria-selected="true">
+                📚 내 스터디
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-public" data-bs-toggle="tab" data-bs-target="#panel-public"
+                    type="button" role="tab" aria-controls="panel-public" aria-selected="false">
                 🌍 공개 스터디 참여
             </button>
         </li>
@@ -53,10 +52,56 @@
 
     <div class="tab-content">
 
+        <!-- 내가 참여한 스터디 판넬 -->
+
+        <div class="tab-pane fade show active" id="panel-my" role="tabpanel" aria-labelledby="tab-my">
+            <div class="bg-white rounded shadow-sm">
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                    <div class="fw-bold">참여 중인 스터디</div>
+                    <div class="text-muted small">총 <span th:text="${myStudiesCount}">0</span>개</div>
+                </div>
+
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item" th:each="ms : ${myStudies}">
+                        <div class="d-flex justify-content-between align-items-start gap-3">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="fw-semibold fs-6" th:text="${ms.title}">진행 중인 스터디명</div>
+                                    <span class="badge bg-primary" th:text="${ms.category}">CS</span>
+                                    <span class="badge bg-light text-dark">
+                                👥 <span th:text="${ms.memberCount}">0</span>/<span th:text="${ms.maxMembers}">0</span>
+                            </span>
+                                </div>
+
+                                <div class="text-muted small mt-1" th:text="${ms.description}">
+                                    스터디에 대한 짧은 설명이 들어갑니다.
+                                </div>
+
+                                <div class="text-muted small mt-1">
+                                    운영자: <span class="fw-semibold" th:text="${ms.ownerName}">운영자명</span>
+                                </div>
+                            </div>
+
+                            <div class="text-end" style="min-width: 100px;">
+                                <a th:href="@{/study/{id}(id=${ms.id})}" class="btn btn-primary btn-sm w-100">
+                                    입장하기
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="list-group-item text-center py-5 text-muted small" th:if="${#lists.isEmpty(myStudies)}">
+                        <div class="mb-2 fs-4">🍃</div>
+                        아직 참여 중인 스터디가 없어요.<br>새로운 스터디를 찾아보거나 직접 만들어보세요!
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- =========================
              PUBLIC STUDIES PANEL
              ========================= -->
-        <div class="tab-pane fade show active" id="panel-public" role="tabpanel" aria-labelledby="tab-public">
+        <div class="tab-pane fade" id="panel-public" role="tabpanel" aria-labelledby="tab-public">
 
             <!-- FILTER BAR -->
             <div class="bg-white p-3 rounded shadow-sm mb-3">
@@ -69,10 +114,10 @@
                         <select class="form-select" name="category">
                             <option value="" th:selected="${category == null || category == ''}">전체 카테고리</option>
                             <option value="CS" th:selected="${category == 'CS'}">CS</option>
-                            <option value="ALGO" th:selected="${category == 'ALGO'}">알고리즘</option>
-                            <option value="BACK" th:selected="${category == 'BACK'}">백엔드</option>
-                            <option value="FRONT" th:selected="${category == 'FRONT'}">프론트엔드</option>
-                            <option value="LANG" th:selected="${category == 'LANG'}">외국어</option>
+                            <option value="CERTIFICATE" th:selected="${category == 'CERTIFICATE'}">자격증</option>
+                            <option value="CODING_TEST" th:selected="${category == 'CODING_TEST'}">코딩 테스트</option>
+                            <option value="PROJECT" th:selected="${category == 'PROJECT'}">프로젝트</option>
+                            <option value="LANGUAGE" th:selected="${category == 'LANGUAGE'}">외국어</option>
                             <option value="ETC" th:selected="${category == 'ETC'}">기타</option>
                         </select>
                     </div>
@@ -101,7 +146,7 @@
                                     <div class="fw-semibold fs-6" th:text="${s.title}">알고리즘 스터디</div>
                                     <span class="badge bg-primary" th:text="${s.category}">ALGO</span>
                                     <span class="badge bg-light text-dark">
-                    👥 <span th:text="${s.memberCount}">3</span>/<span th:text="${s.capacity}">8</span>
+                    👥 <span th:text="${s.memberCount}">3</span>/<span th:text="${s.maxMembers}">8</span>
                   </span>
                                 </div>
 
@@ -111,9 +156,6 @@
 
                                 <div class="text-muted small mt-1">
                                     운영자: <span class="fw-semibold" th:text="${s.ownerName}">홍길동</span>
-                                    <span class="mx-2">•</span>
-                                    참여 방식:
-                                    <span class="badge bg-secondary" th:text="${s.joinPolicy}">REQUEST</span>
                                 </div>
                             </div>
 
@@ -259,5 +301,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/nav-auth-area.js}"></script>
 </body>
 </html>
