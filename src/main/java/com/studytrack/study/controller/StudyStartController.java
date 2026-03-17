@@ -1,9 +1,6 @@
 package com.studytrack.study.controller;
 
 import com.studytrack.study.dto.StudyResponseDto;
-import com.studytrack.study.dto.StudySettingDto;
-import com.studytrack.study.entity.Study;
-import com.studytrack.study.entity.StudyMember;
 import com.studytrack.study.enums.StudyCategory;
 import com.studytrack.study.service.StudyMemberService;
 import com.studytrack.study.service.StudyService;
@@ -11,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

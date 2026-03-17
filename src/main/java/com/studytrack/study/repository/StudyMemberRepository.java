@@ -22,5 +22,7 @@ public interface StudyMemberRepository extends JpaRepository<StudyMember, Long> 
     @Query("select sm from StudyMember sm join fetch sm.study where sm.user.userId = :userId")
     List<StudyMember> findByUserIdWithStudy(@Param("userId") String userId);
 
+    boolean existsByStudyAndUser(Study study, User user);
+
     long countByStudy(Study study);
 }

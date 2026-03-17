@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface StudyRepository extends JpaRepository<Study, Long> {
     boolean existsByInviteCode(String inviteCode);
@@ -39,5 +40,8 @@ public interface StudyRepository extends JpaRepository<Study, Long> {
             "WHERE sm.user.userId = :userId " +
             "AND owner.role = com.studytrack.study.enums.StudyRole.OWNER") // ✅ 방장인 멤버만 선택
     List<StudyResponseDto> findByUserId(@Param("userId") String userId);
+
+    // 초대 코드로 조회
+    Optional<Study> findByInviteCode(String inviteCode);
 
 }

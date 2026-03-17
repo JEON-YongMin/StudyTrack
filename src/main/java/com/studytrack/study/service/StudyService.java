@@ -20,7 +20,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.security.SecureRandom;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -103,7 +102,8 @@ public class StudyService {
     @Transactional(readOnly = true)
     public Page<StudyResponseDto> findPublicStudies(String query, StudyCategory category, Pageable pageable) {
         // Repository에서 Pageable을 포함한 검색 메서드 호출
-        return studyRepository.findPublicStudiesWithOwner(query, category, pageable);
+        String searchQuery = (query != null && !query.trim().isEmpty()) ? query : null;
+        return studyRepository.findPublicStudiesWithOwner(searchQuery, category, pageable);
     }
 
     @Transactional
