@@ -41,7 +41,5 @@ public interface StudyRepository extends JpaRepository<Study, Long> {
             "AND owner.role = com.studytrack.study.enums.StudyRole.OWNER") // ✅ 방장인 멤버만 선택
     List<StudyResponseDto> findByUserId(@Param("userId") String userId);
 
-    // 초대 코드로 조회
-    Optional<Study> findByInviteCode(String inviteCode);
 
 }

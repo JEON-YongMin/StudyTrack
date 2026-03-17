@@ -46,19 +46,4 @@ public class StudyStartRestController {
         }
     }
 
-    @PostMapping("/invite")
-    @ResponseBody
-    public ResponseEntity<?> joinByInviteCode(@RequestBody Map<String, String> requestData) {
-        try {
-            String inviteCodeInput = requestData.get("inviteCodeInput");
-            String userId = requestData.get("userId");
-
-            Long studyId = studyMemberService.joinByInviteCode(inviteCodeInput, userId);
-
-            return ResponseEntity.ok().body(Map.of("message", "초대 코드로 참여에 성공했습니다!", "studyId", studyId));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
-    }
-
 }

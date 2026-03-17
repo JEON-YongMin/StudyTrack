@@ -329,43 +329,6 @@
             alert("서버 통신 중 오류가 발생했습니다.");
         });
     }
-
-    function joinByInviteCode() {
-        const inviteCode = document.getElementById('inviteCodeInput').value;
-        const userId = localStorage.getItem('userId');
-        const token = localStorage.getItem("accessToken");
-
-        if (!inviteCode) {
-            alert("초대 코드를 입력해주세요.");
-            return;
-        }
-
-        const requestData = {
-            inviteCodeInput: inviteCode,
-            userId: userId
-        };
-
-        fetch('/api/study/join/invite', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': token.startsWith('Bearer ') ? token : ('Bearer ' + token)
-            },
-            body: JSON.stringify(requestData)
-        })
-        .then(async (res) => {
-            const data = await res.json();
-            if (res.ok) {
-                alert(data.message);
-                location.href = `/study/${data.studyId}`;
-            } else {
-                alert("실패: " + data.message);
-            }
-        })
-        .catch(err => {
-            alert("서버 통신 중 오류가 발생했습니다.");
-        });
-    }
 </script>
 </body>
 </html>

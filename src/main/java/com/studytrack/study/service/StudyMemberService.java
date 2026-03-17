@@ -61,36 +61,4 @@ public class StudyMemberService {
         studyRepository.save(study);
     }
 
-    @Transactional
-    public Long joinByInviteCode(String inviteCode, String userId) {
-
-        Study study = studyRepository.findByInviteCode(inviteCode)
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 초대 코드입니다."));
-
-        User user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
-
-        if (studyMemberRepository.existsByStudyAndUser(study, user)) {
-            throw new IllegalStateException("이미 참여 중인 스터디입니다.");
-        }
-
-        if (study.getMemberCount() >= study.getMaxMembers()) {
-            throw new IllegalStateException("스터디 정원이 가득 찼습니다.");
-        }
-
-        StudyMember newMember = StudyMember.builder()
-                .study(study)
-                .user(user)
-                .nickname(user.getNickname())
-                .role(StudyRole.MEMBER)
-                .joinedAt(LocalDateTime.now())
-                .build();
-
-        studyMemberRepository.save(newMember);
-
-        study.increaseMemberCount();
-
-        return study.getId();
-    }
-
 }
