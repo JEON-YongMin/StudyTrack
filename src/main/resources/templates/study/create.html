@@ -29,20 +29,20 @@
                     <form action="#" method="post">
                         <div class="mb-3">
                             <label class="form-label fw-semibold">스터디 제목</label>
-                            <input type="text" class="form-control" placeholder="예) 스프링 부트 스터디">
+                            <input type="text" id="title" class="form-control" placeholder="예) 스프링 부트 스터디">
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">스터디 설명</label>
-                            <textarea class="form-control" rows="4" placeholder="스터디 목표, 진행 방식, 주기 등을 간단히 적어주세요"></textarea>
+                            <textarea id="description" class="form-control" rows="4" placeholder="스터디 목표, 진행 방식, 주기 등을 간단히 적어주세요"></textarea>
                         </div>
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold">최대 인원 수</label>
-                                <input type="number" class="form-control" min="2" max="50" value="5">
+                                <input type="number" id="maxMembers" class="form-control" min="2" max="50" value="5">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold">카테고리</label>
-                                <select class="form-select">
+                                <select id="categorySelect" class="form-select">
                                     <option selected disabled>카테고리를 선택하세요</option>
                                     <option>전공 / CS</option>
                                     <option>자격증</option>
@@ -61,21 +61,9 @@
                                 <div class="form-text">비공개 시 초대 코드로만 입장 가능해요.</div>
                             </div>
                         </div>
-                        <hr class="my-4">
-                        <div class="mb-3">
-                            <h6 class="fw-bold mb-2">스터디원 초대하기</h6>
-                            <div class="alert alert-primary border-0">
-                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                    <div><div class="fw-semibold">초대 코드</div></div>
-                                    <code class="px-3 py-2 bg-white rounded border">STUDY-1234</code>
-                                </div>
-                            </div>
-                        </div>
                         <div class="d-flex justify-content-end gap-2 mt-4">
                             <a href="/" class="btn btn-outline-primary">취소</a>
-                            <button type="button" id="createStudyBtn" class="btn btn-primary">
-                                스터디 개설
-                            </button>
+                            <button type="button" id="createStudyBtn" class="btn btn-primary">스터디 개설</button>
                         </div>
                     </form>
                 </div>
@@ -87,87 +75,34 @@
 <footer class="text-center py-4 text-muted small">© 2026 Study Track</footer>
 <script th:src="@{/js/nav-auth-area.js}"></script>
 <script>
-
-    <!-- studyCreate -->
-    document.addEventListener("DOMContentLoaded", function () {
-
-      const btn = document.getElementById("createStudyBtn");
-
-      btn.addEventListener("click", async function () {
-
+    document.getElementById("createStudyBtn").addEventListener("click", async function () {
         const token = localStorage.getItem("accessToken");
-        if (!token) {
-          alert("로그인이 필요합니다.");
-          window.location.href = "/auth/login";
-          return;
-        }
+        if (!token) { alert("로그인이 필요합니다."); return; }
 
-        // 입력값 수집
-        const title = document.querySelector('input[type="text"]').value.trim();
-        const description = document.querySelector("textarea").value.trim();
-        const maxMembers = Number(document.querySelector('input[type="number"]').value);
-        const categoryText = document.querySelector("select").value;
+        const title = document.getElementById("title").value.trim();
+        const description = document.getElementById("description").value.trim();
+        const maxMembers = Number(document.getElementById("maxMembers").value);
+        const categoryText = document.getElementById("categorySelect").value;
         const visibility = document.getElementById("visibility").value;
 
-        const categoryMap = {
-          "전공 / CS": "CS",
-          "자격증": "CERTIFICATE",
-          "코딩 테스트": "CODING_TEST",
-          "프로젝트": "PROJECT",
-          "외국어": "LANGUAGE",
-          "기타": "ETC"
-        };
-
-        if (!title || !description) {
-          alert("제목과 설명을 입력해주세요.");
-          return;
-        }
-
+        const categoryMap = { "전공 / CS": "CS", "자격증": "CERTIFICATE", "코딩 테스트": "CODING_TEST", "프로젝트": "PROJECT", "외국어": "LANGUAGE", "기타": "ETC" };
         const category = categoryMap[categoryText];
-        if (!category) {
-          alert("카테고리를 선택해주세요.");
-          return;
-        }
 
-        const requestBody = {
-          title: title,
-          description: description,
-          maxMembers: maxMembers,
-          category: category,
-          visibility: visibility
-        };
+        if (!title || !description || !category) { alert("입력값을 확인해주세요."); return; }
 
-        try {
-          const response = await fetch("/api/studyCreate", {
+        const res = await fetch("/api/studyCreate", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": token.startsWith("Bearer ") ? token : ("Bearer " + token)
-            },
-            body: JSON.stringify(requestBody)
-          });
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+            body: JSON.stringify({ title, description, maxMembers, category, visibility })
+        });
 
-          if (!response.ok) {
-            const errorText = await response.text();
-            alert("스터디 개설 실패: " + errorText);
-            return;
-          }
-
-          const data = await response.json();
-
-          alert("스터디가 개설되었습니다!");
-
-          // 👉 상세 페이지로 이동
-          // 저장 성공 후
-<!--          window.location.href = `/study/detail?studyId=${data.studyId}`;-->
-          window.location.href = `/study/${data.studyId}`;
-        } catch (error) {
-          console.error(error);
-          alert("서버 오류가 발생했습니다.");
+        if (res.ok) {
+            const data = await res.json();
+            alert("스터디 개설이 완료되었습니다!");
+            window.location.href = `/study/${data.studyId}`;
+        } else {
+            alert("개설 실패: " + await res.text());
         }
-
-      });
-
     });
 </script>
 </body>

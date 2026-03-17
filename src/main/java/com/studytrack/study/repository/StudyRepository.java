@@ -11,8 +11,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface StudyRepository extends JpaRepository<Study, Long> {
+    Optional<Study> findByInviteCode(String inviteCode);
+
     boolean existsByInviteCode(String inviteCode);
 
     @Query("SELECT new com.studytrack.study.dto.StudyResponseDto(" +

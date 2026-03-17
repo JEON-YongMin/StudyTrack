@@ -154,4 +154,50 @@ public class StudyService {
         }
         return sb.toString();
     }
+
+    @Transactional
+    public void inviteMemberByNickname(Long studyId, String nickname) {
+        // 1. 스터디 존재 및 권한 확인 (선택)
+        Study study = studyRepository.findById(studyId)
+                .orElseThrow(() -> new IllegalArgumentException("스터디를 찾을 수 없습니다."));
+
+        // 2. 닉네임으로 대상 유저 찾기
+        User targetUser = userRepository.findByNickname(nickname)
+                .orElseThrow(() -> new IllegalArgumentException("해당 닉네임을 가진 사용자가 없습니다."));
+
+        // 3. 이미 멤버인지 확인
+        if (studyMemberRepository.existsByStudyIdAndUserUserId(studyId, targetUser.getUserId())) {
+            throw new IllegalStateException("이미 스터디 멤버인 사용자입니다.");
+        }
+        System.out.println(nickname + "님에게 초대 코드 발송: " + study.getInviteCode());
+    }
+
+    @Transactional
+    public void joinByInviteCode(String inviteCode, String userId) {
+        // 1. 코드로 스터디 찾기
+        Study study = studyRepository.findByInviteCode(inviteCode)
+                .orElseThrow(() -> new IllegalArgumentException("올바르지 않은 초대 코드입니다."));
+
+        // 2. 정원 확인
+        if (study.getMemberCount() >= study.getMaxMembers()) {
+            throw new IllegalStateException("스터디 정원이 가득 찼습니다.");
+        }
+
+        // 3. 이미 가입된 유저인지 확인
+        if (studyMemberRepository.existsByStudyIdAndUserUserId(study.getId(), userId)) {
+            throw new IllegalStateException("이미 참여 중인 스터디입니다.");
+        }
+
+        // 4. 유저 조회 및 멤버 등록
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        StudyMember newMember = new StudyMember(study, user, user.getNickname(), StudyRole.MEMBER);
+        studyMemberRepository.save(newMember);
+
+        // 5. 인원수 증가
+        study.increaseMemberCount();
+    }
+
+
 }
