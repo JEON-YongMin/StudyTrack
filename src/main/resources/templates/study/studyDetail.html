@@ -71,6 +71,8 @@
                         <span class="badge bg-light text-dark" th:text="${member.role}">역할</span>
                     </li>
                 </ul>
+
+                <button type="button" onclick="memberManagement()" class="btn btn-sm btn-outline-primary w-100 mb-3">멤버 관리</button>
                 <button type="button" onclick="inviteMember()" class="btn btn-sm btn-outline-primary w-100 mb-3">멤버 초대</button>
 
                 <div class="p-3 rounded border bg-light text-center">
@@ -79,16 +81,17 @@
                 </div>
             </div>
 
+            <!-- QUICK ACTIONS -->
             <div class="bg-white p-4 rounded shadow-sm">
-                <h6 class="fw-bold mb-2">⚡ 빠른 작업</h6>
-                <button class="btn btn-outline-primary btn-sm w-100 mb-2" th:onclick="|location.href='/study/${study.id}/notice?mode=create'|">공지 작성</button>
-                <button class="btn btn-primary btn-sm w-100 mb-2" th:onclick="|location.href='/study/${study.id}/assignments/new'|">과제 추가</button>
-                <button class="btn btn-outline-secondary btn-sm w-100" th:onclick="|location.href='/study/${study.id}/setting'|">스터디 설정</button>
+                <div th:replace="~{study/common/fragments :: quickActions(${study.id}, ${study.inviteCode})}"></div>
             </div>
+
         </div>
     </div>
+
 </div>
 
+</body>
 <script th:src="@{/js/nav-auth-area.js}"></script>
 <script th:inline="javascript">
     async function inviteMember() {
@@ -103,6 +106,22 @@
         if (res.ok) alert("초대 완료!");
         else alert("초대 실패: " + await res.text());
     }
+
+    async function memberManagement() {
+
+        const studyId = [[${study.id}]];
+
+        const userId = localStorage.getItem('userId');
+
+        if (!userId) {
+            alert("로그인 정보가 없습니다. 다시 로그인해 주세요.");
+            window.location.href = "/auth/login";
+            return;
+        }
+
+        location.href = `/study/${studyId}/members?userId=${userId}`;
+    }
+
 </script>
 </body>
 </html>
