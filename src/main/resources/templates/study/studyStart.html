@@ -52,8 +52,7 @@
 
     <div class="tab-content">
 
-        <!-- 내가 참여한 스터디 판넬 -->
-
+        <!-- 내가 참여한 스터디 -->
         <div class="tab-pane fade show active" id="panel-my" role="tabpanel" aria-labelledby="tab-my">
             <div class="bg-white rounded shadow-sm">
                 <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
@@ -69,8 +68,8 @@
                                     <div class="fw-semibold fs-6" th:text="${ms.title}">진행 중인 스터디명</div>
                                     <span class="badge bg-primary" th:text="${ms.category}">CS</span>
                                     <span class="badge bg-light text-dark">
-                                👥 <span th:text="${ms.memberCount}">0</span>/<span th:text="${ms.maxMembers}">0</span>
-                            </span>
+                                        👥 <span th:text="${ms.memberCount}">0</span>/<span th:text="${ms.maxMembers}">0</span>
+                                    </span>
                                 </div>
 
                                 <div class="text-muted small mt-1" th:text="${ms.description}">
@@ -92,15 +91,14 @@
 
                     <div class="list-group-item text-center py-5 text-muted small" th:if="${#lists.isEmpty(myStudies)}">
                         <div class="mb-2 fs-4">🍃</div>
-                        아직 참여 중인 스터디가 없어요.<br>새로운 스터디를 찾아보거나 직접 만들어보세요!
+                        아직 참여 중인 스터디가 없어요.<br>
+                        새로운 스터디를 찾아보거나 직접 만들어보세요!
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- =========================
-             PUBLIC STUDIES PANEL
-             ========================= -->
+        <!-- 공개 스터디 참여 -->
         <div class="tab-pane fade" id="panel-public" role="tabpanel" aria-labelledby="tab-public">
 
             <!-- FILTER BAR -->
@@ -126,26 +124,38 @@
                     </div>
                 </form>
             </div>
+
+            <!-- PUBLIC STUDY LIST -->
             <div class="bg-white rounded shadow-sm">
-                <div class="p-3 border-bottom"><div class="fw-bold">공개 스터디 목록</div></div>
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                    <div class="fw-bold">공개 스터디 목록</div>
+                    <div class="text-muted small">
+                        총 <span th:text="${totalPublicCount}">0</span>개
+                    </div>
+                </div>
+
                 <div class="list-group list-group-flush">
-                    <div class="list-group-item py-3" th:each="s : ${publicStudies}">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <div class="d-flex align-items-center gap-2 mb-1">
-                                    <div class="fw-bold fs-5" th:text="${s.title}">스터디명</div>
-                                    <span class="badge bg-primary" th:text="${s.category}">PROJECT</span>
-                                    <span class="badge bg-light text-dark">👥 <span th:text="${s.memberCount}">1</span>/5</span>
+                    <div class="list-group-item" th:each="s : ${publicStudies}">
+                        <div class="d-flex justify-content-between align-items-start gap-3">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="fw-semibold fs-6" th:text="${s.title}">알고리즘 스터디</div>
+                                    <span class="badge bg-primary" th:text="${s.category}">ALGO</span>
+                                    <span class="badge bg-light text-dark">
+                                        👥 <span th:text="${s.memberCount}">3</span>/<span th:text="${s.maxMembers}">8</span>
+                                    </span>
                                 </div>
-                                <div class="text-muted small" th:text="${s.description}">설명</div>
-                                <div class="text-muted small">운영자: <span th:text="${s.ownerName}">hihi</span></div>
+
+                                <div class="text-muted small mt-1" th:text="${s.description}">
+                                    매주 문제 풀이 + 코드 리뷰
+                                </div>
+
+                                <div class="text-muted small mt-1">
+                                    운영자: <span class="fw-semibold" th:text="${s.ownerName}">홍길동</span>
+                                </div>
                             </div>
-                            <div class="text-end">
-                                <button class="btn btn-primary w-100 mb-2" th:onclick="|joinPublicStudy(${s.id})|">참여하기</button>
-                                <a th:href="@{/study/{id}(id=${s.id})}" class="btn btn-outline-secondary btn-sm w-100">상세 보기</a>
 
                             <div class="text-end" style="min-width: 160px;">
-                                <!-- join button -->
                                 <button class="btn btn-primary w-100"
                                         type="button"
                                         th:onclick="'joinStudy(' + ${s.id} + ')'"
@@ -164,29 +174,44 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="list-group-item text-muted small"
+                         th:if="${publicStudies == null || publicStudies.isEmpty()}">
+                        조건에 맞는 공개 스터디가 없어요.
+                    </div>
                 </div>
             </div>
+
+            <!-- pagination -->
+            <div class="d-flex justify-content-center mt-3" th:if="${page != null}">
+                <nav>
+                    <ul class="pagination pagination-sm">
+                        <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{/study/start(page=${page.number-1}, q=${q}, category=${category})}">이전</a>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">
+                                <span th:text="${page.number + 1}">1</span> / <span th:text="${page.totalPages}">1</span>
+                            </span>
+                        </li>
+                        <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{/study/start(page=${page.number+1}, q=${q}, category=${category})}">다음</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
         </div>
 
-        <div class="tab-pane fade" id="panel-invite" role="tabpanel">
-            <div class="row g-4">
+        <!-- 초대 코드로 참여 -->
+        <div class="tab-pane fade" id="panel-invite" role="tabpanel" aria-labelledby="tab-invite">
+            <div class="row g-3">
+
+                <!-- invite form -->
                 <div class="col-md-7">
                     <div class="bg-white p-4 rounded shadow-sm">
-                        <h5 class="fw-bold mb-3">초대 코드 입력</h5>
-                        <p class="text-muted small mb-4">운영자에게 받은 초대 코드를 입력하면 스터디에 참여할 수 있어요.</p>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">초대 코드</label>
-                            <input type="text" id="inviteCodeInput" class="form-control" placeholder="예: ABCDEF12">
-                            <div class="form-text">대소문자를 구분할 수 있어요.</div>
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">가입 메시지 (선택)</label>
-                            <textarea id="joinMessage" class="form-control" rows="4" placeholder="간단히 자기소개나 참여 목적을 남길 수 있어요."></textarea>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <button type="button" class="btn btn-outline-secondary px-4">취소</button>
-                            <button type="button" onclick="joinByInviteCode()" class="btn btn-primary px-4">코드로 참여</button>
-                        </div>
                         <h5 class="fw-bold mb-2">초대 코드 입력</h5>
                         <p class="text-muted small mb-3">
                             운영자에게 받은 초대 코드를 입력하면 스터디에 참여할 수 있어요.
@@ -199,22 +224,37 @@
                             <div class="form-text">대소문자를 구분할 수 있어요.</div>
                         </div>
 
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">가입 메시지 (선택)</label>
+                            <textarea id="joinMessage" class="form-control" rows="4"
+                                      placeholder="간단히 자기소개나 참여 목적을 남길 수 있어요."></textarea>
+                        </div>
+
                         <div class="d-flex justify-content-between">
-                            <button type="button" class="btn btn-primary" onclick="joinByInviteCode()">코드로 참여</button>
+                            <button type="button" class="btn btn-outline-secondary px-4"
+                                    onclick="document.getElementById('inviteCodeInput').value=''; document.getElementById('joinMessage').value='';">
+                                취소
+                            </button>
+                            <button type="button" class="btn btn-primary px-4" onclick="joinByInviteCode()">
+                                코드로 참여
+                            </button>
                         </div>
-                    <!-- 서버에서 에러/성공 메시지 내려줄 때 -->
-                    <div class="mt-3" th:if="${inviteError != null}">
-                        <div class="alert alert-danger py-2 small mb-0" th:text="${inviteError}">
-                            유효하지 않은 코드입니다.
+
+                        <!-- 서버에서 에러/성공 메시지 내려줄 때 -->
+                        <div class="mt-3" th:if="${inviteError != null}">
+                            <div class="alert alert-danger py-2 small mb-0" th:text="${inviteError}">
+                                유효하지 않은 코드입니다.
+                            </div>
                         </div>
-                    </div>
-                    <div class="mt-3" th:if="${inviteSuccess != null}">
-                        <div class="alert alert-success py-2 small mb-0" th:text="${inviteSuccess}">
-                            참여 요청이 완료되었습니다.
+                        <div class="mt-3" th:if="${inviteSuccess != null}">
+                            <div class="alert alert-success py-2 small mb-0" th:text="${inviteSuccess}">
+                                참여 요청이 완료되었습니다.
+                            </div>
                         </div>
-                    </div>
                     </div>
                 </div>
+
+                <!-- tips -->
                 <div class="col-md-5">
                     <div class="bg-white p-4 rounded shadow-sm mb-3">
                         <h6 class="fw-bold mb-3">💡 참여 방식 안내</h6>
@@ -224,6 +264,7 @@
                             <li>승인 필요(REQUEST) 스터디는 운영자 승인을 기다려야 해요.</li>
                         </ul>
                     </div>
+
                     <div class="bg-white p-4 rounded shadow-sm">
                         <h6 class="fw-bold mb-3">✅ 자주 묻는 질문</h6>
                         <div class="small mb-3">
@@ -236,69 +277,32 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
+
     </div>
-                </div>
 
-            </div>
+    <footer class="text-center py-4 text-muted small">
+        © 2026 Study Track
+    </footer>
 
-        </div>
-
-    <footer class="text-center py-5 text-muted small">© 2026 Study Track</footer>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script th:src="@{/js/nav-auth-area.js}"></script>
+
 <script>
-    // 공통 토큰 가져오기
     const getAuthToken = () => {
         const token = localStorage.getItem("accessToken");
-        return token && token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+        if (!token) return null;
+        return token.startsWith("Bearer ") ? token : `Bearer ${token}`;
     };
 
-    // 초대 코드로 참여 (이미지 3)
-    async function joinByInviteCode() {
-        const inviteCode = document.getElementById("inviteCodeInput").value.trim();
-        if (!inviteCode) return alert("초대 코드를 입력해주세요.");
-
-        try {
-            const res = await fetch(`/api/study/join/code?inviteCode=${inviteCode}`, {
-                method: "POST",
-                headers: { "Authorization": getAuthToken() }
-            });
-            if (res.ok) {
-                alert("스터디 참여 성공!");
-                location.reload();
-            } else {
-                alert("참여 실패: " + await res.text());
-            }
-        } catch (e) { alert("서버 통신 오류"); }
-    }
-
-    // 공개 스터디 바로 참여 (이미지 2)
-    async function joinPublicStudy(studyId) {
-        try {
-            const res = await fetch(`/api/study/${studyId}/join`, {
-                method: "POST",
-                headers: { "Authorization": getAuthToken() }
-            });
-            if (res.ok) {
-                alert("참여가 완료되었습니다.");
-                location.reload();
-            } else {
-                alert(await res.text());
-            }
-        } catch (e) { alert("서버 통신 오류"); }
-    }
-</script>
-<script>
     document.addEventListener("DOMContentLoaded", function() {
-        // 1. URL 파라미터 확인 (q 또는 category가 있는지)
         const urlParams = new URLSearchParams(window.location.search);
         const hasQuery = urlParams.has('q') || urlParams.has('category');
 
-        // 2. 검색 조건이 있다면 '공개 스터디' 탭을 클릭한 것처럼 동작
         if (hasQuery) {
             const publicTabEl = document.querySelector('#tab-public');
             if (publicTabEl) {
@@ -308,11 +312,52 @@
         }
     });
 
+    async function joinByInviteCode() {
+        const inviteCode = document.getElementById("inviteCodeInput").value.trim();
+        const token = getAuthToken();
+
+        if (!inviteCode) {
+            alert("초대 코드를 입력해주세요.");
+            return;
+        }
+
+        if (!token) {
+            alert("로그인이 필요합니다.");
+            return;
+        }
+
+        try {
+            const res = await fetch(`/api/study/join/code?inviteCode=${inviteCode}`, {
+                method: "POST",
+                headers: {
+                    "Authorization": token
+                }
+            });
+
+            const text = await res.text();
+
+            if (res.ok) {
+                alert(text || "스터디 참여 성공!");
+                location.reload();
+            } else {
+                alert("참여 실패: " + text);
+            }
+        } catch (e) {
+            console.error(e);
+            alert("서버 통신 오류");
+        }
+    }
+
     function joinStudy(studyId) {
         const userId = localStorage.getItem('userId');
-        const token = localStorage.getItem("accessToken");
+        const token = getAuthToken();
 
         if (!userId) {
+            alert("로그인이 필요합니다.");
+            return;
+        }
+
+        if (!token) {
             alert("로그인이 필요합니다.");
             return;
         }
@@ -327,24 +372,25 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': token.startsWith('Bearer ') ? token : ('Bearer ' + token)
+                'Authorization': token
             },
             body: JSON.stringify(requestData)
         })
-        .then(async (res) => {
-            const data = await res.json();
-            if (res.ok) {
-                alert(data.message);
-                location.href = `/study/${studyId}`;
-            } else {
-                alert("실패: " + data.message);
-            }
-        })
-        .catch(err => {
-            console.error("에러 발생:", err);
-            alert("서버 통신 중 오류가 발생했습니다.");
-        });
+            .then(async (res) => {
+                const data = await res.json();
+                if (res.ok) {
+                    alert(data.message);
+                    location.href = `/study/${studyId}`;
+                } else {
+                    alert("실패: " + data.message);
+                }
+            })
+            .catch(err => {
+                console.error("에러 발생:", err);
+                alert("서버 통신 중 오류가 발생했습니다.");
+            });
     }
 </script>
+
 </body>
 </html>
