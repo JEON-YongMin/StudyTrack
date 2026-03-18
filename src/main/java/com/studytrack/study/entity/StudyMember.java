@@ -5,11 +5,15 @@ import com.studytrack.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @AllArgsConstructor
+@Getter
+@Setter
 @Builder
 public class StudyMember {
 
@@ -44,13 +48,4 @@ public class StudyMember {
         this.role = role;
         this.joinedAt = LocalDateTime.now();
     }
-
-    public Long getId() { return id; }
-    public Study getStudy() { return study; }
-    public User getUser() { return user; }
-    public String getNickname() {
-        return nickname;
-    }
-    public StudyRole getRole() { return role; }
-    public LocalDateTime getJoinedAt() { return joinedAt; }
 }

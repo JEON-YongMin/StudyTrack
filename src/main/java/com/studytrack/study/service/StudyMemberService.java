@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class StudyMemberService {
@@ -59,6 +62,42 @@ public class StudyMemberService {
         study.increaseMemberCount();
 
         studyRepository.save(study);
+    }
+
+    @Transactional
+    public void updateRole(Long memberId, String roleName) {
+        StudyMember member = studyMemberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 멤버가 없습니다."));
+
+        // String을 Enum(Role)으로 변환하여 설정
+        member.setRole(StudyRole.valueOf(roleName));
+    }
+
+    @Transactional
+    public void removeMember(Long memberId) {
+        studyMemberRepository.deleteById(memberId);
+    }
+
+
+    public List<StudyMember> searchMembers(Long studyId, String nickname, String roleFilter) {
+        // 1. 해당 스터디의 전체 멤버를 먼저 가져옴
+        List<StudyMember> members = studyMemberRepository.findByStudyId(studyId);
+
+        // 2. 닉네임 검색어 필터링 (case-insensitive)
+        if (nickname != null && !nickname.isEmpty()) {
+            members = members.stream()
+                    .filter(m -> m.getNickname().toLowerCase().contains(nickname.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+
+        // 3. 역할(Role) 필터링
+        if (roleFilter != null && !roleFilter.isEmpty()) {
+            members = members.stream()
+                    .filter(m -> m.getRole().name().equals(roleFilter))
+                    .collect(Collectors.toList());
+        }
+
+        return members;
     }
 
 }

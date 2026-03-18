@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+
+<div th:fragment="quickActions(studyId, inviteCode)">
+    <h6 class="fw-bold mb-2">⚡ 빠른 작업</h6>
+    <a th:href="@{/study/{id}/notice(id=${studyId}, mode='create')}" class="btn btn-outline-primary btn-sm w-100 mb-2">공지 작성</a>
+    <a th:href="@{'/study/' + ${studyId} + '/assignments/new'}" class="btn btn-primary btn-sm w-100 mb-2">과제 추가</a>
+    <a th:href="@{'/study/' + ${studyId} + '/setting'}" class="btn btn-outline-secondary btn-sm w-100">스터디 설정</a>
+</div>
+
+</html>

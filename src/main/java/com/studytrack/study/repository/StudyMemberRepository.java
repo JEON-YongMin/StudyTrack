@@ -17,12 +17,16 @@ public interface StudyMemberRepository extends JpaRepository<StudyMember, Long> 
 
     Optional<StudyMember> findByStudyIdAndRole(Long studyId, StudyRole role);
 
+    Optional<StudyMember> findByStudy_IdAndUser_UserId(Long studyId, String userId);
+
     boolean existsByStudyIdAndUserUserId(Long studyId, String userId);
 
     @Query("select sm from StudyMember sm join fetch sm.study where sm.user.userId = :userId")
     List<StudyMember> findByUserIdWithStudy(@Param("userId") String userId);
 
     boolean existsByStudyAndUser(Study study, User user);
+
+    List<StudyMember> findByStudyId(Long studyId);
 
     long countByStudy(Study study);
 }

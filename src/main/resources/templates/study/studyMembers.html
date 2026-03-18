@@ -37,33 +37,36 @@
             <div class="bg-white p-4 rounded shadow-sm mb-4">
                 <h3 class="fw-bold mb-1">👥 멤버 관리</h3>
                 <p class="text-muted mb-0">
-                    멤버 초대, 역할 변경, 참여 요청 승인, 멤버 내보내기를 할 수 있어요.
+                    멤버 초대, 역할 변경, 멤버 내보내기를 할 수 있어요.
                 </p>
             </div>
 
             <!-- TOOLBAR -->
             <div class="bg-white p-3 rounded shadow-sm mb-3">
-                <div class="row g-2 align-items-center">
-                    <div class="col-md-6">
-                        <input type="text" class="form-control" name="q"
-                               placeholder="멤버 검색 (이름/이메일)"
-                               th:value="${q}">
+                <form th:action="@{/study/{id}/members(id=${study.id})}" method="get">
+                    <input type="hidden" name="userId" th:value="${param.userId}">
+
+                    <div class="row g-2 align-items-center">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" name="q"
+                                   placeholder="멤버 검색 (이름)"
+                                   th:value="${q}">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" name="roleFilter">
+                                <option value="" th:selected="${roleFilter == null || roleFilter == ''}">전체 역할</option>
+                                <option value="OWNER" th:selected="${roleFilter == 'OWNER'}">운영자</option>
+                                <option value="MANAGER" th:selected="${roleFilter == 'MANAGER'}">매니저</option>
+                                <option value="MEMBER" th:selected="${roleFilter == 'MEMBER'}">팀원</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-grid gap-2 d-md-flex">
+                            <button type="submit" class="btn btn-primary flex-grow-1">필터 적용</button>
+                            <a th:href="@{/study/{id}/members(id=${study.id}, userId=${param.userId})}"
+                               class="btn btn-outline-secondary">초기화</a>
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <select class="form-select" name="roleFilter">
-                            <option value="" th:selected="${roleFilter == null || roleFilter == ''}">전체 역할</option>
-                            <option value="OWNER" th:selected="${roleFilter == 'OWNER'}">운영자</option>
-                            <option value="MANAGER" th:selected="${roleFilter == 'MANAGER'}">매니저</option>
-                            <option value="MEMBER" th:selected="${roleFilter == 'MEMBER'}">팀원</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3 d-grid">
-                        <!-- 실제로는 form으로 감싸 GET /members?q=.. -->
-                        <a th:href="@{/study/{id}/members(id=${study.id})}" class="btn btn-outline-secondary">
-                            필터 적용
-                        </a>
-                    </div>
-                </div>
+                </form>
             </div>
 
             <!-- MEMBER LIST -->
@@ -77,56 +80,47 @@
 
                 <div class="list-group list-group-flush">
 
-                    <div class="list-group-item d-flex justify-content-between align-items-start"
-                         th:each="m : ${members}">
-                        <div class="me-3">
-                            <div class="fw-semibold" th:text="${m.name}">홍길동</div>
-                            <div class="text-muted small" th:text="${m.email}">hong@test.com</div>
-                            <div class="text-muted small">
-                                가입: <span th:text="${m.joinedAt}">2026-02-20</span>
+                    <div class="list-group-item d-flex align-items-center py-3" th:each="m : ${members}">
+
+                        <div style="flex: 1;">
+                            <div class="fw-bold fs-6" th:text="${m.nickname}">홍길동</div>
+                            <div class="text-muted" style="font-size: 0.8rem;">
+                                가입일: <span th:text="${#temporals.format(m.joinedAt, 'yyyy-MM-dd')}">2026-02-20</span>
                             </div>
                         </div>
 
-                        <div class="text-end" style="min-width: 220px;">
-                            <!-- Role badge -->
-                            <div class="mb-2">
-                                <span class="badge bg-primary" th:if="${m.role == 'OWNER'}">OWNER</span>
-                                <span class="badge bg-secondary" th:if="${m.role == 'MANAGER'}">MANAGER</span>
-                                <span class="badge bg-light text-dark" th:if="${m.role == 'MEMBER'}">MEMBER</span>
-                            </div>
-
-                            <!-- Actions (권한 있는 사용자만) -->
-                            <div th:if="${canManageMembers}" class="d-flex gap-2 justify-content-end">
-
-                                <!-- change role -->
-                                <form th:action="@{/study/{id}/members/{memberId}/role(id=${study.id}, memberId=${m.id})}"
-                                      method="post" class="m-0" style="width: 130px;">
-                                    <select name="role" class="form-select form-select-sm"
-                                            th:disabled="${m.role == 'OWNER'}">
-                                        <option value="MEMBER" th:selected="${m.role=='MEMBER'}">팀원</option>
-                                        <option value="MANAGER" th:selected="${m.role=='MANAGER'}">매니저</option>
-                                    </select>
-                                    <button type="submit" class="btn btn-sm btn-outline-primary w-100 mt-2"
-                                            th:disabled="${m.role == 'OWNER'}">
-                                        역할 변경
-                                    </button>
-                                </form>
-
-                                <!-- kick -->
-                                <form th:action="@{/study/{id}/members/{memberId}/kick(id=${study.id}, memberId=${m.id})}"
-                                      method="post" class="m-0">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger"
-                                            th:disabled="${m.role == 'OWNER'}"
-                                            onclick="return confirm('이 멤버를 내보낼까요?');">
-                                        내보내기
-                                    </button>
-                                </form>
-                            </div>
-
-                            <div th:if="${!canManageMembers}" class="text-muted small">
-                                권한이 없어 변경할 수 없어요.
+                        <div class="text-center" style="flex: 1;">
+                            <div th:switch="${m.role.name()}">
+                                <span th:case="'OWNER'" class="badge bg-primary px-3">OWNER</span>
+                                <span th:case="'MANAGER'" class="badge bg-secondary px-3">MANAGER</span>
+                                <span th:case="'MEMBER'" class="badge bg-light text-dark border px-3">MEMBER</span>
                             </div>
                         </div>
+
+                        <div class="d-flex gap-2 justify-content-end align-items-center" style="flex: 1.5;">
+                            <form th:action="@{/study/{studyId}/members/{memberId}/role(studyId=${study.id}, memberId=${m.id})}" method="post" class="d-flex gap-1 m-0">
+                                <input type="hidden" name="userId" th:value="${param.userId}">
+                                <select name="role" class="form-select form-select-sm" style="width: 100px;" th:disabled="${m.role.name() == 'OWNER' or myInfo.role.name() == 'MEMBER'}">
+                                    <option value="MEMBER" th:selected="${m.role.name() == 'MEMBER'}">팀원</option>
+                                    <option value="MANAGER" th:selected="${m.role.name() == 'MANAGER'}">매니저</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-outline-primary text-nowrap"
+                                        th:disabled="${m.role.name() == 'OWNER' or myInfo.role.name() == 'MEMBER'}">
+                                    변경
+                                </button>
+                            </form>
+
+                            <form th:action="@{/study/{studyId}/members/{memberId}/kick(studyId=${study.id}, memberId=${m.id})}"
+                                  method="post" class="m-0">
+                                <input type="hidden" name="userId" th:value="${param.userId}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger text-nowrap"
+                                        th:disabled="${m.role.name() == 'OWNER' or myInfo.role.name() == 'MEMBER'}"
+                                        onclick="return confirm('이 멤버를 내보낼까요?');">
+                                    내보내기
+                                </button>
+                            </form>
+                        </div>
+
                     </div>
 
                     <!-- empty -->
@@ -137,56 +131,10 @@
 
                 </div>
             </div>
-
-            <!-- JOIN REQUESTS (승인 필요일 때) -->
-            <div class="bg-white p-4 rounded shadow-sm mb-4"
-                 th:if="${joinRequests != null}">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold m-0">🙋 참여 요청</h5>
-                    <span class="text-muted small">
-                        <span th:text="${joinRequests.size()}">0</span>건
-                    </span>
-                </div>
-
-                <div class="list-group">
-                    <div class="list-group-item d-flex justify-content-between align-items-center"
-                         th:each="r : ${joinRequests}">
-                        <div>
-                            <div class="fw-semibold" th:text="${r.name}">김규완</div>
-                            <div class="text-muted small" th:text="${r.email}">kyuwan@test.com</div>
-                            <div class="text-muted small">
-                                요청: <span th:text="${r.requestedAt}">2026-02-20</span>
-                            </div>
-                        </div>
-
-                        <div class="d-flex gap-2" th:if="${canManageMembers}">
-                            <form th:action="@{/study/{id}/requests/{requestId}/approve(id=${study.id}, requestId=${r.id})}"
-                                  method="post" class="m-0">
-                                <button class="btn btn-sm btn-primary" type="submit">승인</button>
-                            </form>
-                            <form th:action="@{/study/{id}/requests/{requestId}/reject(id=${study.id}, requestId=${r.id})}"
-                                  method="post" class="m-0">
-                                <button class="btn btn-sm btn-outline-danger" type="submit"
-                                        onclick="return confirm('요청을 거절할까요?');">
-                                    거절
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <div class="text-muted small mt-2" th:if="${joinRequests.isEmpty()}">
-                        현재 참여 요청이 없어요.
-                    </div>
-                </div>
-            </div>
-
             <!-- BACK -->
             <div class="d-flex justify-content-between">
                 <a th:href="@{/study/{id}(id=${study.id})}" class="btn btn-outline-secondary">
                     돌아가기
-                </a>
-                <a th:href="@{/study/{id}/settings(id=${study.id})}" class="btn btn-outline-primary">
-                    설정으로
                 </a>
             </div>
 
@@ -205,11 +153,7 @@
                     </div>
                     <div class="mb-1">
                         <span class="text-muted">멤버</span><br>
-                        👥 <span th:text="${study.memberCount}">5</span> / <span th:text="${study.capacity}">8</span>
-                    </div>
-                    <div class="mb-1">
-                        <span class="text-muted">참여 방식</span><br>
-                        <span class="badge bg-secondary" th:text="${study.joinPolicy}">REQUEST</span>
+                        👥 <span th:text="${study.memberCount}">5</span> / <span th:text="${study.maxMembers}">8</span>
                     </div>
                     <div>
                         <span class="text-muted">공개</span><br>
@@ -223,47 +167,17 @@
                 <h6 class="fw-bold mb-2">✉️ 멤버 초대</h6>
 
                 <!-- email invite -->
-                <form th:action="@{/study/{id}/invite/email(id=${study.id})}" method="post">
-                    <label class="form-label small text-muted">이메일로 초대</label>
-                    <div class="input-group mb-2">
-                        <input type="email" class="form-control" name="email" placeholder="example@email.com">
-                        <button class="btn btn-outline-primary" type="submit">전송</button>
+                <div class="fw-bold mb-2">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div><div class="text-muted">초대 코드</div></div>
+                        <code th:text="${study.inviteCode}" class="px-3 py-2 bg-white rounded border">STUDY-1234</code>
                     </div>
-                    <div class="form-text">백엔드는 나중에 연결해도 UI 확인 가능해요.</div>
-                </form>
-
-                <hr class="my-3">
-
-                <!-- invite link -->
-                <div>
-                    <label class="form-label small text-muted">초대 링크</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" readonly
-                               th:value="${inviteLink}"
-                               value="https://studytrack.app/invite/ABCDEFG">
-                        <button class="btn btn-outline-secondary" type="button">
-                            복사
-                        </button>
-                    </div>
-                    <div class="form-text">초대 코드를 갱신하는 버튼을 추가할 수도 있어요.</div>
                 </div>
             </div>
 
             <!-- QUICK ACTIONS -->
             <div class="bg-white p-4 rounded shadow-sm">
-                <h6 class="fw-bold mb-2">⚡ 빠른 작업</h6>
-                <a th:href="@{/notices/create?studyId={id}(id=${study.id})}"
-                   class="btn btn-outline-primary btn-sm w-100 mb-2">
-                    공지 작성
-                </a>
-                <a th:href="@{/assignment/create?studyId={id}(id=${study.id})}"
-                   class="btn btn-outline-primary btn-sm w-100 mb-2">
-                    과제 추가
-                </a>
-                <a th:href="@{/study/{id}/settings(id=${study.id})}"
-                   class="btn btn-outline-secondary btn-sm w-100">
-                    스터디 설정
-                </a>
+                <div th:replace="~{study/common/fragments :: quickActions(${study.id}, ${study.inviteCode})}"></div>
             </div>
 
         </div>
