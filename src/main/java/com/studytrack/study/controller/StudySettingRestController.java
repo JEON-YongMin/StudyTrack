@@ -17,6 +17,15 @@ public class StudySettingRestController {
 
     private final StudyService studyService;
 
+    @PostMapping("/invite")
+    public ResponseEntity<String> inviteMember(
+            @PathVariable Long studyId,
+            @RequestParam String nickname) {
+
+        studyService.inviteMemberByNickname(studyId, nickname);
+        return ResponseEntity.ok(nickname + "님에게 초대를 보냈습니다.");
+    }
+
     // 스터디 설정 업데이트 (PUT)
     @PutMapping
     public StudySettingDto.Response updateSettings(
