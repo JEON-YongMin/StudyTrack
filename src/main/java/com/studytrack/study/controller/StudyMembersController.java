@@ -51,13 +51,13 @@ public class StudyMembersController {
 
     @PostMapping("/{memberId}/role")
     public String changeMemberRole(@PathVariable("studyId") Long studyId,
-                                   @PathVariable("memberId") Long memberId,
+                                   @PathVariable("memberId") String memberId,
                                    @RequestParam("role") String role,
                                    @RequestParam("userId") String userId) {
         // 1. 보안 체크: 요청을 보낸 유저(userId)가 방장(OWNER)이나 매니저인지 확인하는 로직 권장
 
         // 2. 역할 업데이트 서비스 호출
-        studyMemberService.updateRole(memberId, role);
+        studyMemberService.updateRole(studyId, memberId, role);
 
         // 3. 작업 후 다시 멤버 관리 페이지로 리다이렉트 (userId 유지)
         return "redirect:/study/" + studyId + "/members?userId=" + userId;

@@ -2,6 +2,7 @@ package com.studytrack.study.service;
 
 import com.studytrack.study.entity.Study;
 import com.studytrack.study.entity.StudyMember;
+import com.studytrack.study.enums.Status;
 import com.studytrack.study.enums.StudyRole;
 import com.studytrack.study.repository.StudyMemberRepository;
 import com.studytrack.study.repository.StudyRepository;
@@ -53,20 +54,32 @@ public class StudyMemberService {
                 .user(user)
                 .nickname(user.getNickname()) // 유저의 기본 닉네임 사용
                 .role(StudyRole.MEMBER)      // 기본 역할은 MEMBER
-                .joinedAt(LocalDateTime.now())
+                .applicationAt(LocalDateTime.now())
+                .status(Status.WAITING)
                 .build();
 
         studyMemberRepository.save(newMember);
 
-        // 스터디 현재 인원수 증가
-        study.increaseMemberCount();
-
-        studyRepository.save(study);
     }
 
     @Transactional
-    public void updateRole(Long memberId, String roleName) {
-        StudyMember member = studyMemberRepository.findById(memberId)
+    public void updateStatus(Long studyId, String userId, String status){
+
+        Study study = studyRepository.findById(studyId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
+        StudyMember member = studyMemberRepository.findByStudy_IdAndUser_UserId(studyId, userId).orElseThrow(() -> new IllegalArgumentException("해당 멤버가 없습니다."));
+
+        if (status.equals("APPROVED")) {
+            member.setStatus(Status.APPROVED);
+            study.increaseMemberCount();
+        }else if (status.equals("REJECTED")) {
+            member.setStatus(Status.REJECTED);
+        }
+
+    }
+
+    @Transactional
+    public void updateRole(Long studyId, String userId, String roleName) {
+        StudyMember member = studyMemberRepository.findByStudy_IdAndUser_UserId(studyId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 멤버가 없습니다."));
 
         // String을 Enum(Role)으로 변환하여 설정

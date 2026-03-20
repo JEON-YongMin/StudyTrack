@@ -5,6 +5,7 @@ import com.studytrack.study.dto.StudyResponseDto;
 import com.studytrack.study.dto.StudySettingDto;
 import com.studytrack.study.entity.Study;
 import com.studytrack.study.entity.StudyMember;
+import com.studytrack.study.enums.Status;
 import com.studytrack.study.enums.StudyCategory;
 import com.studytrack.study.enums.StudyRole;
 import com.studytrack.study.repository.StudyMemberRepository;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -55,7 +57,7 @@ public class StudyService {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalStateException("로그인 사용자를 찾을 수 없습니다."));
 
-        StudyMember owner = new StudyMember(savedStudy, user, user.getNickname(), StudyRole.OWNER);
+        StudyMember owner = new StudyMember(savedStudy, user, user.getNickname(), StudyRole.OWNER, LocalDateTime.now(), Status.APPROVED);
         studyMemberRepository.save(owner);
 
         return new StudyCreateDto.StudyCreateResponse(savedStudy.getId(), savedStudy.getInviteCode());
@@ -192,7 +194,7 @@ public class StudyService {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        StudyMember newMember = new StudyMember(study, user, user.getNickname(), StudyRole.MEMBER);
+        StudyMember newMember = new StudyMember(study, user, user.getNickname(), StudyRole.MEMBER, LocalDateTime.now(), Status.APPROVED );
         studyMemberRepository.save(newMember);
 
         // 5. 인원수 증가
