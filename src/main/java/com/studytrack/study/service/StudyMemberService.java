@@ -63,10 +63,10 @@ public class StudyMemberService {
     }
 
     @Transactional
-    public void updateStatus(Long studyId, String userId, String status){
+    public void updateStatus(Long studyId, Long memberId, String status){
 
         Study study = studyRepository.findById(studyId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
-        StudyMember member = studyMemberRepository.findByStudy_IdAndUser_UserId(studyId, userId).orElseThrow(() -> new IllegalArgumentException("해당 멤버가 없습니다."));
+        StudyMember member = studyMemberRepository.findByStudy_IdAndId(studyId, memberId).orElseThrow(() -> new IllegalArgumentException("해당 멤버가 없습니다."));
 
         if (status.equals("APPROVED")) {
             member.setStatus(Status.APPROVED);
@@ -78,9 +78,8 @@ public class StudyMemberService {
     }
 
     @Transactional
-    public void updateRole(Long studyId, String userId, String roleName) {
-        StudyMember member = studyMemberRepository.findByStudy_IdAndUser_UserId(studyId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 멤버가 없습니다."));
+    public void updateRole(Long studyId, Long memberId, String roleName) {
+        StudyMember member = studyMemberRepository.findByStudy_IdAndId(studyId, memberId).orElseThrow(() -> new IllegalArgumentException("해당 멤버가 없습니다."));
 
         // String을 Enum(Role)으로 변환하여 설정
         member.setRole(StudyRole.valueOf(roleName));
@@ -92,7 +91,7 @@ public class StudyMemberService {
     }
 
 
-    public List<StudyMember> searchMembers(Long studyId, String nickname, String roleFilter) {
+    public List<StudyMember> searchMembers(Long studyId, String nickname, String roleFilter, String statusFilter) {
         // 1. 해당 스터디의 전체 멤버를 먼저 가져옴
         List<StudyMember> members = studyMemberRepository.findByStudyId(studyId);
 
@@ -107,6 +106,13 @@ public class StudyMemberService {
         if (roleFilter != null && !roleFilter.isEmpty()) {
             members = members.stream()
                     .filter(m -> m.getRole().name().equals(roleFilter))
+                    .collect(Collectors.toList());
+        }
+
+        // 4. 역할(status) 필터링
+        if (statusFilter != null && !statusFilter.isEmpty()) {
+            members = members.stream()
+                    .filter(m -> m.getStatus().name().equals(statusFilter))
                     .collect(Collectors.toList());
         }
 
