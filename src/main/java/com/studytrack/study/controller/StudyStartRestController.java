@@ -38,7 +38,7 @@ public class StudyStartRestController {
             studyMemberService.join(studyId, userId);
 
             return ResponseEntity.ok(
-                    Map.of("message", "성공적으로 참여되었습니다.")
+                    Map.of("message", "참여 승인 요청이 전달되었습니다.")
             );
 
         } catch (IllegalStateException e) {

@@ -1,5 +1,6 @@
 package com.studytrack.study.entity;
 
+import com.studytrack.study.enums.Status;
 import com.studytrack.study.enums.StudyRole;
 import com.studytrack.user.entity.User;
 import jakarta.persistence.*;
@@ -36,16 +37,25 @@ public class StudyMember {
     @Column(nullable = false)
     private StudyRole role;
 
-    @Column(nullable = false)
+    @Column
     private LocalDateTime joinedAt;
+
+    @Column(nullable = false)
+    private LocalDateTime applicationAt;
+
+    @Column(nullable = false)
+    private Status status;
 
     protected StudyMember() {}
 
-    public StudyMember(Study study, User user, String nickname, StudyRole role) {
+    public StudyMember(Study study, User user, String nickname, StudyRole role,  LocalDateTime joinedAt, Status status) {
         this.study = study;
         this.user = user;
         this.nickname = nickname;
         this.role = role;
-        this.joinedAt = LocalDateTime.now();
+        this.joinedAt = joinedAt;
+        this.applicationAt = LocalDateTime.now();
+        this.status = status;
     }
+
 }

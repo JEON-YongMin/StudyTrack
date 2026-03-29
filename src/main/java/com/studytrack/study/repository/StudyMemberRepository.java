@@ -19,6 +19,8 @@ public interface StudyMemberRepository extends JpaRepository<StudyMember, Long> 
 
     Optional<StudyMember> findByStudy_IdAndUser_UserId(Long studyId, String userId);
 
+    Optional<StudyMember> findByStudy_IdAndId(Long studyId, Long memberId);
+
     boolean existsByStudyIdAndUserUserId(Long studyId, String userId);
 
     @Query("select sm from StudyMember sm join fetch sm.study where sm.user.userId = :userId")

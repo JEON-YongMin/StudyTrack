@@ -40,6 +40,7 @@ public interface StudyRepository extends JpaRepository<Study, Long> {
             "JOIN s.members sm " +    // 현재 로그인한 유저가 멤버인지 확인하기 위한 조인
             "JOIN s.members owner " + // 방장 정보를 가져오기 위한 조인
             "WHERE sm.user.userId = :userId " +
+            "AND sm.status = com.studytrack.study.enums.Status.APPROVED " +
             "AND owner.role = com.studytrack.study.enums.StudyRole.OWNER") // ✅ 방장인 멤버만 선택
     List<StudyResponseDto> findByUserId(@Param("userId") String userId);
 

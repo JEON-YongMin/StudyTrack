@@ -380,7 +380,6 @@
                 const data = await res.json();
                 if (res.ok) {
                     alert(data.message);
-                    location.href = `/study/${studyId}`;
                 } else {
                     alert("실패: " + data.message);
                 }
