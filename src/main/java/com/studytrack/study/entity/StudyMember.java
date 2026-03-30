@@ -43,12 +43,19 @@ public class StudyMember {
     @Column(nullable = false)
     private LocalDateTime applicationAt;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
 
+    // [추가] 초대 여부 플래그: true(방장이 초대함), false(유저가 신청함)
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean isInvited = false;
+
     protected StudyMember() {}
 
-    public StudyMember(Study study, User user, String nickname, StudyRole role,  LocalDateTime joinedAt, Status status) {
+    // 생성자 업데이트
+    public StudyMember(Study study, User user, String nickname, StudyRole role, LocalDateTime joinedAt, Status status, boolean isInvited) {
         this.study = study;
         this.user = user;
         this.nickname = nickname;
@@ -56,6 +63,6 @@ public class StudyMember {
         this.joinedAt = joinedAt;
         this.applicationAt = LocalDateTime.now();
         this.status = status;
+        this.isInvited = isInvited;
     }
-
 }

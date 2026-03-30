@@ -1,6 +1,7 @@
 package com.studytrack.study.controller;
 
 import com.studytrack.study.dto.StudyResponseDto;
+import com.studytrack.study.entity.StudyMember;
 import com.studytrack.study.enums.StudyCategory;
 import com.studytrack.study.service.StudyMemberService;
 import com.studytrack.study.service.StudyService;
@@ -28,20 +29,24 @@ public class StudyStartController {
                              @RequestParam(value = "category", required = false) StudyCategory category,
                              @PageableDefault(size = 10) Pageable pageable,
                              Model model) {
-        // 2. 내 스터디 목록 조회
+
         List<StudyResponseDto> myStudies = studyService.getMyStudies(userId);
-
-        // 공개 스터디 조회
         Page<StudyResponseDto> publicStudies = studyService.findPublicStudies(query, category, pageable);
+        List<StudyMember> receivedInvites = studyMemberService.getWaitingInvites(userId);
 
-        model.addAttribute("publicStudies", publicStudies);
-        model.addAttribute("totalPublicCount", publicStudies.getTotalElements());
-        model.addAttribute("q", query);
-        model.addAttribute("category", category);
         model.addAttribute("myStudies", myStudies);
         model.addAttribute("myStudiesCount", myStudies.size());
 
+        model.addAttribute("publicStudies", publicStudies);
+        model.addAttribute("totalPublicCount", publicStudies.getTotalElements());
+
+        model.addAttribute("receivedInvites", receivedInvites);
+        model.addAttribute("receivedInvitesCount", receivedInvites.size());
+
+        model.addAttribute("q", query);
+        model.addAttribute("category", category);
+        model.addAttribute("userId", userId);
+
         return "study/studyStart";
     }
-
 }
