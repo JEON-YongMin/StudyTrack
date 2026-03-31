@@ -33,7 +33,7 @@
                         <small class="text-muted" th:text="${#temporals.format(notice.createdAt, 'yyyy-MM-dd')}">날짜</small>
                     </a>
                 </div>
-                <a th:href="@{/study/{sid}/notice(sid=${study.id}, mode='create')}" class="btn btn-sm btn-outline-primary mt-3">공지 작성</a>
+                <a class="btn btn-sm btn-outline-primary mt-3" id="noticeCreate" th:href="@{/study/{sid}/notice(sid=${study.id}, mode='create')}" >공지 작성</a>
             </div>
 
             <div class="bg-white p-4 rounded shadow-sm mb-4">
@@ -50,7 +50,7 @@
                         </div>
                     </a>
                 </div>
-                <a class="btn btn-primary mt-3" th:href="@{'/study/' + ${study.id} + '/assignments/new'}">과제 추가</a>
+                <a class="btn btn-primary mt-3" id="assignmentsNew" th:href="@{'/study/' + ${study.id} + '/assignments/new'}">과제 추가</a>
             </div>
         </div>
 
@@ -82,7 +82,7 @@
             </div>
 
             <!-- QUICK ACTIONS -->
-            <div class="bg-white p-4 rounded shadow-sm">
+            <div id="quickActions" class="bg-white p-4 rounded shadow-sm">
                 <div th:replace="~{study/common/fragments :: quickActions(${study.id}, ${study.inviteCode})}"></div>
             </div>
 
@@ -93,7 +93,28 @@
 
 </body>
 <script th:src="@{/js/nav-auth-area.js}"></script>
+<script th:src="@{/js/auth-util.js}"></script>
 <script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", async () => {
+
+        const studyId = [[${study.id}]];
+
+        const role = await AuthUtil.getMyRole(studyId);
+
+        // 3. 역할(Role)에 따른 페이지 제어
+        if (role === 'MEMBER') {
+            const assignmentsNew = document.getElementById("assignmentsNew");
+            const noticeCreate = document.getElementById("noticeCreate");
+            const quickActions = document.getElementById("quickActions");
+
+            assignmentsNew.style.display = 'none';
+            noticeCreate.style.display = 'none';
+            quickActions.style.display = 'none';
+        }
+
+        console.log("현재 접속 유저 역할:", role);
+    });
+
     async function inviteMember() {
         const nickname = prompt("초대할 유저의 닉네임을 입력하세요:");
         if (!nickname) return;

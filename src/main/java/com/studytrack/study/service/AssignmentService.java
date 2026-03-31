@@ -71,7 +71,8 @@ public class AssignmentService {
                 form.title(),
                 form.description(),
                 form.priority(),
-                form.dueDate()
+                form.dueDate(),
+                form.progress()
         );
 
         // save 호출은 선택(영속 상태면 트랜잭션에서 flush됨). 명확히 하려면 save 해도 OK
