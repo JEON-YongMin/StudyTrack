@@ -57,7 +57,7 @@ public class StudyService {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalStateException("로그인 사용자를 찾을 수 없습니다."));
 
-        StudyMember owner = new StudyMember(savedStudy, user, user.getNickname(), StudyRole.OWNER, LocalDateTime.now(), Status.APPROVED);
+        StudyMember owner = new StudyMember(savedStudy, user, user.getNickname(), StudyRole.OWNER, LocalDateTime.now(), Status.APPROVED, false);
         studyMemberRepository.save(owner);
 
         return new StudyCreateDto.StudyCreateResponse(savedStudy.getId(), savedStudy.getInviteCode());
@@ -194,7 +194,7 @@ public class StudyService {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        StudyMember newMember = new StudyMember(study, user, user.getNickname(), StudyRole.MEMBER, LocalDateTime.now(), Status.APPROVED );
+        StudyMember newMember = new StudyMember(study, user, user.getNickname(), StudyRole.MEMBER, LocalDateTime.now(), Status.APPROVED, false);
         studyMemberRepository.save(newMember);
 
         // 5. 인원수 증가

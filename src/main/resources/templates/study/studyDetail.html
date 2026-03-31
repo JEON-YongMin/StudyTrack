@@ -97,20 +97,31 @@
     async function inviteMember() {
         const nickname = prompt("초대할 유저의 닉네임을 입력하세요:");
         if (!nickname) return;
+
         const studyId = [[${study.id}]];
         const token = localStorage.getItem("accessToken");
-        const res = await fetch(`/api/study/${studyId}/setting/invite?nickname=${nickname}`, {
+        const inviterId = localStorage.getItem("userId"); // 초대자 ID 추가
+
+        // 서버 경로를 @PostMapping("/study/{studyId}/invite")에 맞게 수정
+        const res = await fetch(`/study/${studyId}/invite?nickname=${nickname}&inviterId=${inviterId}`, {
             method: "POST",
-            headers: { "Authorization": "Bearer " + token }
+            headers: {
+                "Authorization": "Bearer " + token
+            }
         });
-        if (res.ok) alert("초대 완료!");
-        else alert("초대 실패: " + await res.text());
+
+        if (res.ok) {
+            alert("초대가 정상적으로 발송되었습니다!");
+            // 초대가 성공하면 DB에 데이터가 쌓였으므로,
+            // 이제 hello 계정으로 로그인하면 목록이 뜰 겁니다.
+        } else {
+            const errorMsg = await res.text();
+            alert("초대 실패: " + errorMsg);
+        }
     }
 
     async function memberManagement() {
-
         const studyId = [[${study.id}]];
-
         const userId = localStorage.getItem('userId');
 
         if (!userId) {
@@ -118,10 +129,8 @@
             window.location.href = "/auth/login";
             return;
         }
-
         location.href = `/study/${studyId}/members?userId=${userId}`;
     }
-
 </script>
 </body>
 </html>
