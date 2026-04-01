@@ -151,19 +151,7 @@
 
             <!-- QUICK ACTIONS -->
             <div class="bg-white p-4 rounded shadow-sm">
-                <h6 class="fw-bold mb-2">⚡ 빠른 작업</h6>
-                <a th:href="@{/notices/create?studyId={id}(id=${study.id})}"
-                   class="btn btn-outline-primary btn-sm w-100 mb-2">
-                    공지 작성
-                </a>
-                <a th:href="@{/assignment/create?studyId={id}(id=${study.id})}"
-                   class="btn btn-outline-primary btn-sm w-100 mb-2">
-                    과제 추가
-                </a>
-                <a th:href="@{/study/{id}/members(id=${study.id})}"
-                   class="btn btn-outline-secondary btn-sm w-100">
-                    멤버 보기
-                </a>
+                <div th:replace="~{study/common/fragments :: quickActions(${study.id}, ${study.inviteCode})}"></div>
             </div>
 
         </div>

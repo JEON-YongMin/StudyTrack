@@ -55,10 +55,12 @@ public class Assignment {
     public void update(String title,
                        String description,
                        Priority priority,
-                       LocalDateTime dueDate) {
+                       LocalDateTime dueDate,
+                       Progress progress) {
         this.title = title;
         this.description = description;
         this.priority = priority;
         this.dueDate = dueDate;
+        this.progress = progress;
     }
 }

@@ -30,6 +30,11 @@ public class StudyMemberService {
                 .orElseThrow(() -> new IllegalArgumentException("스터디 OWNER를 찾을 수 없습니다. studyId=" + studyId));
     }
 
+    public StudyMember getMember(Long studyId, String userId) {
+        return studyMemberRepository.findByStudy_IdAndUser_UserId(studyId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("멤버를 찾을 수 없습니다. studyId=" + studyId + ", userId=" + userId));
+    }
+
     @Transactional
     public void join(Long studyId, String userId) {
         Study study = studyRepository.findById(studyId)

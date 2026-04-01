@@ -34,10 +34,20 @@ public class JwtProvider {
     }
 
     public String getUserId(String token) {
+        if (token == null || token.isBlank()) {
+            throw new IllegalArgumentException("토큰이 유효하지 않습니다.");
+        }
+
+        // 2. Bearer 접두사 제거 및 앞뒤 공백 제거 (.trim() 추가)
+        String compactToken = token.trim();
+        if (compactToken.startsWith("Bearer ")) {
+            compactToken = compactToken.substring(7).trim(); // "Bearer " 이후의 실제 토큰만 추출 후 다시 trim
+        }
+
         Jws<Claims> parsed = Jwts.parser()
                 .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
                 .build()
-                .parseClaimsJws(token);
+                .parseClaimsJws(compactToken);
 
         return parsed.getBody().getSubject(); // createAccessToken에서 subject에 userId 넣었지
     }

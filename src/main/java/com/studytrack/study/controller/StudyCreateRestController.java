@@ -33,7 +33,7 @@ public class StudyCreateRestController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public StudyCreateDto.StudyCreateResponse create(@Valid @RequestBody StudyCreateDto.StudyCreateRequest request) {
-        return studyCreateService.create(request); // ✅ 더미 말고 실제 저장
+        return studyCreateService.create(request);
     }
 
     @Operation(summary = "스터디 상세 조회", description = "studyId로 스터디 상세를 조회합니다.")

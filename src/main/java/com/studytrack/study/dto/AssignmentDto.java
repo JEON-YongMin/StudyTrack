@@ -30,6 +30,7 @@ public class AssignmentDto {
             @NotBlank String title,
             String description,
             @NotNull LocalDateTime dueDate,
-            @NotNull Priority priority
+            @NotNull Priority priority,
+            @NotNull Progress progress
     ) {}
 }
